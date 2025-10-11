@@ -1,0 +1,18 @@
+# src/main/resources/application-prod.yml
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  datasource:
+    # 本番環境ではPostgreSQLを使用
+    url: jdbc:postgresql://localhost:5432/production_db
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USERNAME} # 環境変数から取得するのが安全
+    password: ${POSTGRES_PASSWORD} # 環境変数から取得するのが安全
+  jpa:
+    hibernate:
+      # スキーマの自動更新は本番環境では推奨しません
+      ddl-auto: none

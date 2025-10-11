@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.UserMapper">
+    
+    <select id="findByEmail" resultType="com.example.demo.domain.User">
+        SELECT id, name, email, password, is_active FROM user_table WHERE email = #{email}
+    </select>
+
+    <select id="findRolesByUserId" resultType="java.lang.String">
+        SELECT role FROM role_table WHERE user_id = #{userId}
+    </select>
+</mapper>
