@@ -6,7 +6,7 @@ class PasswordEncoderTest {
     @Test
     void generateBcryptPassword() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String rawPassword = "admin";
+        String rawPassword = "user";
 
         String hashedPassword = encoder.encode(rawPassword);
 

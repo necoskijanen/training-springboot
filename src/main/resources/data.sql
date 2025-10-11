@@ -8,8 +8,18 @@ VALUES (
     TRUE,
     CURRENT_TIMESTAMP(),
     CURRENT_TIMESTAMP()
+),
+(
+    2,
+    'Regular User',
+    'user@example.com',
+    '$2a$10$D02/ZV6Wb7Bw1BjQ.sNumugMY3VYpPdN/aJOoiNow3FX0V1WO.Cmq',
+    TRUE,
+    CURRENT_TIMESTAMP(),
+    CURRENT_TIMESTAMP()
 );
 
 -- ロールの投入
 INSERT INTO role_table (user_id, role) VALUES (1, 'ADMIN');
 INSERT INTO role_table (user_id, role) VALUES (1, 'USER');
+INSERT INTO role_table (user_id, role) VALUES (2, 'USER');
