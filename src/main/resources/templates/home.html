@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>ホーム</title>
+</head>
+
+<body>
+    <h1>ようこそ！</h1>
+
+    <p>
+        現在ログイン中のユーザー:
+        <span sec:authentication="name">ユーザー名</span>
+    </p>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">ログアウト</button>
+    </form>
+</body>
+
+</html>
