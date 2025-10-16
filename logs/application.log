@@ -1,0 +1,50 @@
+2025-10-17 08:09:53.466 [main] INFO  com.example.demo.Main - Starting Main using Java 21.0.8 with PID 825867 (/home/user/src/training-springboot/target/classes started by user in /home/user/src/training-springboot)
+2025-10-17 08:09:53.467 [main] DEBUG com.example.demo.Main - Running with Spring Boot v3.5.6, Spring v6.2.11
+2025-10-17 08:09:53.467 [main] INFO  com.example.demo.Main - No active profile set, falling back to 1 default profile: "default"
+2025-10-17 08:09:54.043 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-10-17 08:09:54.051 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2025-10-17 08:09:54.052 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-10-17 08:09:54.052 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2025-10-17 08:09:54.080 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-10-17 08:09:54.081 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 594 ms
+2025-10-17 08:09:54.141 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-10-17 08:09:54.236 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:devdb user=SA
+2025-10-17 08:09:54.237 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-10-17 08:09:54.436 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2025-10-17 08:09:54.488 [main] DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CsrfFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-10-17 08:09:54.595 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2025-10-17 08:09:54.607 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-10-17 08:09:54.612 [main] INFO  com.example.demo.Main - Started Main in 1.443 seconds (process running for 1.582)
+2025-10-17 08:09:54.614 [main] INFO  com.example.demo.Main - アプリケーションが正常に起動しました
+2025-10-17 08:10:11.617 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-17 08:10:11.618 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-10-17 08:10:11.618 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2025-10-17 08:10:11.628 [http-nio-8080-exec-1] DEBUG o.s.security.web.FilterChainProxy - Securing GET /login
+2025-10-17 08:10:11.631 [http-nio-8080-exec-1] DEBUG o.s.security.web.FilterChainProxy - Secured GET /login
+2025-10-17 08:10:11.788 [http-nio-8080-exec-1] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-10-17 08:10:11.820 [http-nio-8080-exec-2] DEBUG o.s.security.web.FilterChainProxy - Securing GET /favicon.ico
+2025-10-17 08:10:11.821 [http-nio-8080-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-10-17 08:10:11.822 [http-nio-8080-exec-2] DEBUG o.s.s.web.DefaultRedirectStrategy - Redirecting to http://localhost:8080/login
+2025-10-17 08:10:14.637 [http-nio-8080-exec-3] DEBUG o.s.security.web.FilterChainProxy - Securing POST /login
+2025-10-17 08:10:14.712 [http-nio-8080-exec-3] DEBUG c.e.d.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT u.id AS id, u.name AS name, u.email AS email, u.password AS password, u.is_active AS is_active, rd.name AS role_name FROM user_master u INNER JOIN user_role ur ON u.id = ur.user_id INNER JOIN role_definition rd ON ur.role_id = rd.id WHERE u.email = ?
+2025-10-17 08:10:14.725 [http-nio-8080-exec-3] DEBUG c.e.d.mapper.UserMapper.findByEmail - ==> Parameters: admin@example.com(String)
+2025-10-17 08:10:14.740 [http-nio-8080-exec-3] TRACE c.e.d.mapper.UserMapper.findByEmail - <==    Columns: ID, NAME, EMAIL, PASSWORD, IS_ACTIVE, ROLE_NAME
+2025-10-17 08:10:14.740 [http-nio-8080-exec-3] TRACE c.e.d.mapper.UserMapper.findByEmail - <==        Row: 1, Admin User, admin@example.com, $2a$10$u/PayOaUO96YklC0trr9.ezsEw7pKNUmYQ1ZGI5zhf2NY1A/SMnd6, TRUE, ADMIN
+2025-10-17 08:10:14.741 [http-nio-8080-exec-3] TRACE c.e.d.mapper.UserMapper.findByEmail - <==        Row: 1, Admin User, admin@example.com, $2a$10$u/PayOaUO96YklC0trr9.ezsEw7pKNUmYQ1ZGI5zhf2NY1A/SMnd6, TRUE, USER
+2025-10-17 08:10:14.742 [http-nio-8080-exec-3] DEBUG c.e.d.mapper.UserMapper.findByEmail - <==      Total: 2
+2025-10-17 08:10:14.808 [http-nio-8080-exec-3] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2025-10-17 08:10:14.808 [http-nio-8080-exec-3] DEBUG o.s.s.w.a.s.ChangeSessionIdAuthenticationStrategy - Changed session id from 2BC320A3E08F55D3FE439624828657B3
+2025-10-17 08:10:14.808 [http-nio-8080-exec-3] DEBUG o.s.s.w.c.CsrfAuthenticationStrategy - Replaced CSRF Token
+2025-10-17 08:10:14.808 [http-nio-8080-exec-3] DEBUG o.s.s.w.c.HttpSessionSecurityContextRepository - Stored SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=admin@example.com, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN, ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=2BC320A3E08F55D3FE439624828657B3], Granted Authorities=[ROLE_ADMIN, ROLE_USER]]] to HttpSession [org.apache.catalina.session.StandardSessionFacade@54494533]
+2025-10-17 08:10:14.808 [http-nio-8080-exec-3] DEBUG o.s.s.w.a.UsernamePasswordAuthenticationFilter - Set SecurityContextHolder to UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=admin@example.com, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN, ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=2BC320A3E08F55D3FE439624828657B3], Granted Authorities=[ROLE_ADMIN, ROLE_USER]]
+2025-10-17 08:10:14.813 [http-nio-8080-exec-4] DEBUG o.s.security.web.FilterChainProxy - Securing GET /admin/home
+2025-10-17 08:10:14.813 [http-nio-8080-exec-4] DEBUG o.s.s.w.c.HttpSessionSecurityContextRepository - Retrieved SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=admin@example.com, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN, ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=2BC320A3E08F55D3FE439624828657B3], Granted Authorities=[ROLE_ADMIN, ROLE_USER]]]
+2025-10-17 08:10:14.813 [http-nio-8080-exec-4] DEBUG o.s.security.web.FilterChainProxy - Secured GET /admin/home
+2025-10-17 08:10:14.841 [http-nio-8080-exec-5] DEBUG o.s.security.web.FilterChainProxy - Securing GET /login
+2025-10-17 08:10:14.841 [http-nio-8080-exec-5] DEBUG o.s.security.web.FilterChainProxy - Secured GET /login
+2025-10-17 08:10:14.844 [http-nio-8080-exec-5] DEBUG o.s.s.w.c.HttpSessionSecurityContextRepository - Retrieved SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=admin@example.com, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN, ROLE_USER]], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=2BC320A3E08F55D3FE439624828657B3], Granted Authorities=[ROLE_ADMIN, ROLE_USER]]]
+2025-10-17 08:10:52.032 [SpringApplicationShutdownHook] INFO  com.example.demo.Main - アプリケーションを終了します
+2025-10-17 08:10:52.033 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-17 08:10:52.036 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-10-17 08:10:52.038 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-10-17 08:10:52.039 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
