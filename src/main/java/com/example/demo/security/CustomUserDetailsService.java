@@ -14,31 +14,32 @@ import java.util.stream.Collectors;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserMapper userMapper;
+        private final UserMapper userMapper;
 
-    public CustomUserDetailsService(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
+        public CustomUserDetailsService(UserMapper userMapper) {
+                this.userMapper = userMapper;
+        }
 
-    // 認証ロジックの実装
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userMapper.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-        List<Role> roles = user.getRoles();
+        // 認証ロジックの実装
+        @Override
+        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                User user = userMapper.findByEmail(email)
+                                .orElseThrow(() -> new UsernameNotFoundException(
+                                                "User not found with email: " + email));
+                List<Role> roles = user.getRoles();
 
-        // Spring SecurityのUserDetailsオブジェクトを生成
-        var authorities = roles.stream()
-                // ロール名をAuthorityとして登録
-                .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(
-                        "ROLE_" + role.getName()))
-                .collect(Collectors.toList());
+                // Spring SecurityのUserDetailsオブジェクトを生成
+                var authorities = roles.stream()
+                                // ロール名をAuthorityとして登録
+                                .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                                "ROLE_" + role.getName()))
+                                .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.getIsActive(),
-                true, true, true,
-                authorities);
-    }
+                return new org.springframework.security.core.userdetails.User(
+                                user.getEmail(),
+                                user.getPassword(),
+                                user.getIsActive(),
+                                true, true, true,
+                                authorities);
+        }
 }

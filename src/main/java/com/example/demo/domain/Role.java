@@ -4,7 +4,7 @@ import lombok.Data;
 import org.apache.ibatis.type.Alias;
 
 @Data
-@Alias("Role")
+@Alias("RoleDefinition")
 public class Role {
     private int id;
     private String name;

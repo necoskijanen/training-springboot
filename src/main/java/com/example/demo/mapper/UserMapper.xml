@@ -23,11 +23,13 @@
             u.email AS email,
             u.password AS password,
             u.is_active AS is_active,
-            r.name AS role_name
+            rd.name AS role_name
         FROM
             user_master u
-        LEFT JOIN role_definition r 
-            ON u.id = r.user_id
+        INNER JOIN
+            user_role ur ON u.id = ur.user_id
+        INNER JOIN
+            role_definition rd ON ur.role_id = rd.id
         WHERE
             u.email = #{email}
     </select>

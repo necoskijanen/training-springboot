@@ -21,9 +21,16 @@ VALUES
 );
 
 -- ロールの投入
-INSERT INTO role_definition (user_id, name)
+INSERT INTO role_definition (id, name)
 VALUES 
  (1, 'ADMIN')
-,(1, 'USER')
 ,(2, 'USER')
+;
+
+-- ユーザーロールの投入
+INSERT INTO user_role (user_id, role_id)
+VALUES
+ (1, 1) -- Admin UserにADMINロールを付与
+,(1, 2) -- Admin UserにUSERロールを付与
+,(2, 2) -- Regular UserにUSERロールを付与
 ;
