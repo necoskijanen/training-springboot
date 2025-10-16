@@ -8,4 +8,8 @@ import org.apache.ibatis.type.Alias;
 public class Role {
     private int id;
     private String name;
+
+    public String getAuthName() {
+        return "ROLE_" + name;
+    }
 }

@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 var authorities = roles.stream()
                                 // ロール名をAuthorityとして登録
                                 .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(
-                                                "ROLE_" + role.getName()))
+                                                role.getAuthName()))
                                 .collect(Collectors.toList());
 
                 return new org.springframework.security.core.userdetails.User(
