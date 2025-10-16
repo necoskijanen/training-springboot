@@ -16,7 +16,7 @@ CREATE TABLE user_table (
 -- ロールテーブルの作成
 CREATE TABLE role_table (
     user_id BIGINT NOT NULL,
-    role VARCHAR(50) NOT NULL,
-    PRIMARY KEY (user_id, role),
+    name VARCHAR(50) NOT NULL,
+    PRIMARY KEY (user_id, name),
     FOREIGN KEY (user_id) REFERENCES user_table(id)
 );
