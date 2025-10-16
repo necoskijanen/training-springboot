@@ -1,9 +1,9 @@
 -- テーブルが既に存在する場合は削除 (開発・テスト用)
-DROP TABLE IF EXISTS role_table;
-DROP TABLE IF EXISTS user_table;
+DROP TABLE IF EXISTS role_definition;
+DROP TABLE IF EXISTS user_master;
 
 -- ユーザーテーブルの作成
-CREATE TABLE user_table (
+CREATE TABLE user_master (
     id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -14,9 +14,9 @@ CREATE TABLE user_table (
 );
 
 -- ロールテーブルの作成
-CREATE TABLE role_table (
+CREATE TABLE role_definition (
     user_id BIGINT NOT NULL,
     name VARCHAR(50) NOT NULL,
     PRIMARY KEY (user_id, name),
-    FOREIGN KEY (user_id) REFERENCES user_table(id)
+    FOREIGN KEY (user_id) REFERENCES user_master(id)
 );

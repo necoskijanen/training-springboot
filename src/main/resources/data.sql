@@ -1,5 +1,5 @@
 -- H2 DBはPostgreSQLのように自動シーケンスを生成しない場合があるため、明示的にIDを指定
-INSERT INTO user_table (id, name, email, password, is_active, created_at, updated_at)
+INSERT INTO user_master (id, name, email, password, is_active, created_at, updated_at)
 VALUES
 (
     1,
@@ -21,7 +21,7 @@ VALUES
 );
 
 -- ロールの投入
-INSERT INTO role_table (user_id, name)
+INSERT INTO role_definition (user_id, name)
 VALUES 
  (1, 'ADMIN')
 ,(1, 'USER')
