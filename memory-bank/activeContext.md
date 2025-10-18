@@ -2,32 +2,28 @@
 
 ## Current Work Focus
 
-### Memory Bank Initialization
-- Creating the foundational documentation for the project
-- Establishing the knowledge base for future development work
-- Status: In Progress
+### Batch Processing Infrastructure Expansion
+- Batch execution infrastructure has been partially created (BatchController, BatchService, BatchConfig)
+- Batch configuration YAML file in place with test job definitions
+- Need to expand service implementation and connect to REST API
+- Status: In Progress - Expanding batch service implementation and documenting current state
 
 ## Recent Changes
 
+### 2025/10/19 - Batch Infrastructure Implementation & Memory Bank Update
+- **BatchController.java**: Routes for batch UI pages at `/admin/batch/start`, `/user/batch/start`, `/admin/batch/history`, `/user/batch/history`
+- **BatchService.java**: Service class created with @Service, @Slf4j, and @Transactional annotations
+- **BatchConfig.java**: Configuration properties mapping batch job definitions from YAML
+- **batch/config.yml**: Job definitions with wait_time_test and wait_time_error test jobs
+- **UI Templates**: batch/start.html and batch/history.html templates created
+- **Test Scripts**: wait_time.sh and wait_time.bat for batch execution testing
+- **Memory Bank Update**: Updating activeContext.md and progress.md to reflect current implementation state
+
 ### 2025/10/17 - Memory Bank Creation
-- **Created**: `projectbrief.md`
-  - Documented project purpose, goals, and requirements
-  - Defined technology stack and success criteria
-  
-- **Created**: `productContext.md`
-  - Explained why the project exists
-  - Documented user journeys for ADMIN and USER roles
-  - Outlined batch execution workflow
-  
-- **Created**: `systemPatterns.md`
-  - Documented layered architecture
-  - Described key design patterns in use
-  - Mapped component relationships and security flow
-  
-- **Created**: `techContext.md`
-  - Listed all dependencies and versions
-  - Documented development environment setup
-  - Outlined future technical additions
+- **Created**: `projectbrief.md` - Project scope, goals, requirements
+- **Created**: `productContext.md` - Problem domain and user journeys
+- **Created**: `systemPatterns.md` - Architecture and design patterns
+- **Created**: `techContext.md` - Technology stack and development environment
 
 ## Current System State
 
@@ -53,73 +49,112 @@
    - Admin home page
    - User home page
 
-### Not Yet Implemented
+### Partially Implemented
 1. **Logging System**
-   - No structured logging in place
-   - Need to implement JSON logging
-   - Need to add proper log levels and context
+   - @Slf4j annotation added to BatchController
+   - logback-spring.xml exists but needs JSON configuration
+   - Need comprehensive logging throughout application layers
 
 2. **Batch Execution Interface**
-   - No batch controller yet
-   - No batch service layer
-   - No process management
+   - ✅ BatchController created with UI routing
+   - ✅ BatchConfig created for configuration management
+   - ✅ Templates created (batch/start.html, batch/history.html)
+   - ❌ Batch execution logic not yet implemented in service
+   - ❌ Process management (ProcessBuilder) not yet integrated
 
 3. **Batch Status Monitoring**
-   - No REST API for status polling
-   - No real-time status updates
-   - No status tracking mechanism
+   - ❌ No REST API endpoints (/api/batch/execute, /api/batch/status/{id})
+   - ❌ No asynchronous execution tracking
+   - ❌ No CompletableFuture-based status tracking
 
 4. **Batch Execution History**
-   - No history database schema
-   - No history display page
-   - No pagination
+   - ❌ No batch_execution_history table in schema
+   - ✅ Templates exist but not connected to data
+   - ❌ No pagination implemented
+
 
 ## Next Steps
 
 ### Immediate Priorities
-Based on the specifications, the next features to implement are:
+1. **Implement Batch Service Logic**
+   - Add batch execution methods to BatchService
+   - Implement ProcessBuilder-based execution
+   - Create asynchronous execution with CompletableFuture
+   - Add execution status tracking
 
-1. **Logging Implementation**
-   - Add Logback configuration
-   - Implement structured JSON logging
-   - Add logging to existing components
-   - Create security event logging
+2. **Create Batch Domain Models**
+   - Create BatchExecution entity
+   - Create ExecutionStatus enum
+   - Add necessary repositories for batch data
 
-2. **Batch Processing Foundation**
-   - Create batch execution domain models
-   - Design batch history database schema
-   - Implement batch service layer
-   - Create batch controller
+3. **Database Schema Update for Batch History**
+   - Add batch_execution_history table to schema.sql
+   - Define fields: id, job_id, start_time, end_time, status, exit_code, user_id
+   - Create indexes for performance
 
-3. **Batch Status API**
-   - Design REST API endpoints
-   - Implement asynchronous execution
-   - Create status tracking mechanism
-   - Build status polling endpoint
+4. **Implement REST API for Batch Operations**
+   - Create @RestController for /api/batch endpoints
+   - Implement /api/batch/execute POST endpoint
+   - Implement /api/batch/status/{id} GET endpoint
+   - Support 5-second polling from frontend
 
-4. **Batch Execution UI**
-   - Create batch execution page
-   - Implement program selection interface
-   - Add status display with auto-refresh
-   - Build execution history view
+5. **Complete Batch UI Integration**
+   - Implement job selection in batch/start.html
+   - Add execution trigger button
+   - Implement real-time status display with polling
+   - Connect batch/history.html to data
 
-5. **Pagination**
-   - Add pagination support to MyBatis queries
-   - Implement page navigation UI
-   - Add page size configuration
+6. **Enhance Logging**
+   - Configure Logback for JSON output
+   - Add comprehensive logging to all layers
+   - Implement security event logging
+   - Add request/response tracking
 
-### Open Questions
-- Which directory should be configured for batch programs?
-- What format should batch programs be in? (shell scripts, JAR files, etc.)
-- Should batch execution be restricted to ADMIN role only?
-- What should the default page size be for history pagination?
-- Should there be a maximum execution time for batch processes?
+7. **Implement Pagination**
+   - Add MyBatis pagination queries
+   - Create Pageable DTOs
+   - Implement frontend pagination UI
 
-### Technical Decisions Needed
-- Logging format: Determine exact JSON schema for logs
-- Batch execution: Decide on thread pool size and configuration
-- Database: Plan migration strategy from H2 to production database
-- Error handling: Define error response format for REST API
+### Technical Decisions Resolved
+- **Batch Configuration**: YAML-based (batch/config.yml) with flexible job definitions
+- **Test Environment**: Shell and batch scripts for testing (wait_time.sh/.bat)
+- **Async Processing**: Planned CompletableFuture approach
+- **Role-Based Access**: Both ADMIN and USER roles can access batch features
+- **Timeout Configuration**: 60 seconds per job (configured in config.yml)
+
+### Batch Start Screen Specification (確定: 2025/10/19)
+
+**UI レイアウト：**
+- 上部：ジョブ選択ドロップダウン（enabled:trueのみ）+ 詳細ボタン
+- 中部：パラメータ表示（読み取り専用テーブル） + 実行ボタン
+- 下部：実行履歴テーブル（ページネーション対応）
+
+**REST API（4エンドポイント）：**
+1. GET /api/batch/jobs → ジョブリスト
+2. POST /api/batch/execute (jobId送信) → executionId返却
+3. GET /api/batch/status/{executionId} → ステータスポーリング用（5秒ごと）
+4. GET /api/batch/history?page=0&size=10 → 履歴取得
+
+**フロントエンド：**
+- Vanilla JavaScript（fetch + setInterval + DOM操作）
+- 複雑性なし - Reactなし
+
+**重要な仕様：**
+- executionId: サーバーで UUID.randomUUID() で生成
+- パラメータ: 固定値、ユーザーは変更不可
+- ステータス: RUNNING, COMPLETED_SUCCESS, FAILED
+- ポーリング間隔: 5秒
+- 履歴テーブル: batch_execution_history に保存
+
+**次の実装タスク：**
+1. schema.sql に batch_execution_history テーブル追加
+2. ExecutionStatus enum + BatchExecution エンティティ作成
+3. BatchRestController で 4つの API 実装
+4. BatchService で ProcessBuilder 実行 + UUID 管理
+5. batch/start.html を完全実装
+6. JavaScript で API 連携 + ポーリング実装
+
+
 
 ## Development Guidelines Reminder
 
