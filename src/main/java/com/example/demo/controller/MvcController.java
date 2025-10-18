@@ -12,9 +12,4 @@ public class MvcController {
         return "login";
     }
 
-    @GetMapping("/")
-    public String home() {
-        // src/main/resources/templates/home.html を表示
-        return "home";
-    }
 }

@@ -1,5 +1,9 @@
 package com.example.demo.config;
 
+import com.example.demo.authentication.application.UserDetailsServiceImpl;
+import com.example.demo.authentication.presentation.CustomAuthenticationFailureHandler;
+import com.example.demo.authentication.presentation.CustomAuthenticationSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,14 +11,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
-import com.example.demo.security.CustomAuthenticationFailureHandler;
-import com.example.demo.security.CustomAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private CustomAuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -22,32 +31,25 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
-        return new CustomAuthenticationFailureHandler();
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/login", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest()
                         .authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(customAuthenticationSuccessHandler())
-                        .failureHandler(customAuthenticationFailureHandler())
+                        .successHandler(authenticationSuccessHandler)
+                        .failureHandler(authenticationFailureHandler)
                         .permitAll())
                 .logout(logout -> logout
-                        .permitAll());
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll())
+                .userDetailsService(userDetailsService);
 
         return http.build();
     }
+
 }
