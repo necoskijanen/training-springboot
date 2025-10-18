@@ -1,4 +1,4 @@
-package com.example.demo.authentication.presentation;
+package com.example.demo.authentication;
 
 import java.io.IOException;
 

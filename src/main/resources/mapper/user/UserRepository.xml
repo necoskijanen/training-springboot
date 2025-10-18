@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- filepath: src/main/resources/mapper/user/UserRepository.xml -->
+<mapper namespace="com.example.demo.domain.user.repository.UserRepository">
+
+    <resultMap id="userResultMap" type="com.example.demo.domain.user.User">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+        <result property="isActive" column="is_active"/>
+        <result property="admin" column="admin"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <collection property="roles" ofType="com.example.demo.domain.user.Role">
+            <id property="id" column="role_id"/>
+            <result property="name" column="role_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="findByName" resultMap="userResultMap">
+        SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.password,
+            u.is_active,
+            u.admin,
+            u.created_at,
+            u.updated_at,
+            r.id as role_id,
+            r.name as role_name
+        FROM
+            user_master u
+        LEFT JOIN
+            user_role ur ON u.id = ur.user_id
+        LEFT JOIN
+            role_definition r ON ur.role_id = r.id
+        WHERE
+            u.name = #{name}
+    </select>
+
+    <select id="findById" resultMap="userResultMap">
+        SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.password,
+            u.is_active,
+            u.admin,
+            u.created_at,
+            u.updated_at,
+            r.id as role_id,
+            r.name as role_name
+        FROM
+            user_master u
+        LEFT JOIN
+            user_role ur ON u.id = ur.user_id
+        LEFT JOIN
+            role_definition r ON ur.role_id = r.id
+        WHERE
+            u.id = #{id}
+    </select>
+
+    <select id="searchUsers" resultMap="userResultMap">
+        SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.password,
+            u.is_active,
+            u.admin,
+            u.created_at,
+            u.updated_at,
+            r.id as role_id,
+            r.name as role_name
+        FROM
+            user_master u
+        LEFT JOIN
+            user_role ur ON u.id = ur.user_id
+        LEFT JOIN
+            role_definition r ON ur.role_id = r.id
+        <where>
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND u.email LIKE CONCAT('%', #{email}, '%')
+            </if>
+        </where>
+        ORDER BY u.id
+    </select>
+
+    <select id="existsByName" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM user_master
+        WHERE name = #{name}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_master (name, email, password, is_active, admin, created_at, updated_at)
+        VALUES (#{name}, #{email}, #{password}, #{isActive}, #{admin}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update">
+        UPDATE user_master
+        SET
+            name = #{name},
+            email = #{email},
+            password = #{password},
+            is_active = #{isActive},
+            admin = #{admin},
+            updated_at = #{updatedAt}
+        WHERE
+            id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM user_master
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findAll" resultMap="userResultMap">
+        SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.password,
+            u.is_active,
+            u.admin,
+            u.created_at,
+            u.updated_at,
+            r.id as role_id,
+            r.name as role_name
+        FROM
+            user_master u
+        LEFT JOIN
+            user_role ur ON u.id = ur.user_id
+        LEFT JOIN
+            role_definition r ON ur.role_id = r.id
+        ORDER BY u.id
+    </select>
+
+</mapper>

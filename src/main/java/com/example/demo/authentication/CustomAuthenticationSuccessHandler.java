@@ -1,10 +1,8 @@
-package com.example.demo.authentication.presentation;
+package com.example.demo.authentication;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +20,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             Authentication authentication) throws IOException, ServletException {
 
         // 認証されたユーザーが持つ権限（ロール）を取得
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        var authorities = authentication.getAuthorities();
 
-        // 💡 ロールに基づいてリダイレクト先を決定
+        // ロールに基づいてリダイレクト先を決定
         String redirectUrl = "/"; // デフォルトのリダイレクト先
 
         // ロールをチェック

@@ -1,4 +1,4 @@
-package com.example.demo.authentication.domain;
+package com.example.demo.domain.user;
 
 import lombok.Data;
 import org.apache.ibatis.type.Alias;

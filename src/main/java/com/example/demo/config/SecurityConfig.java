@@ -1,8 +1,9 @@
 package com.example.demo.config;
 
-import com.example.demo.authentication.application.UserDetailsServiceImpl;
-import com.example.demo.authentication.presentation.CustomAuthenticationFailureHandler;
-import com.example.demo.authentication.presentation.CustomAuthenticationSuccessHandler;
+import com.example.demo.authentication.CustomAuthenticationFailureHandler;
+import com.example.demo.authentication.CustomAuthenticationSuccessHandler;
+import com.example.demo.authentication.UserDetailsServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
