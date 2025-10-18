@@ -1,0 +1,195 @@
+# Project-Specific Rules and Patterns
+
+Read the files in ./docs/rules
+
+## Memory Bank Structure
+
+This project uses a comprehensive Memory Bank system located in `memory-bank/`:
+
+### Core Files (Always Read First)
+1. **projectbrief.md** - Foundation document defining project scope and goals
+2. **productContext.md** - Why the project exists and user journey flows
+3. **systemPatterns.md** - Architecture and design patterns
+4. **techContext.md** - Technology stack and development environment
+5. **activeContext.md** - Current work focus and recent changes
+6. **progress.md** - Implementation status and next steps
+
+### Memory Bank Workflow
+- **At session start**: Read ALL memory bank files to understand current state
+- **During development**: Update relevant files as context changes
+- **On user request "update memory bank"**: Review ALL files, even if no changes needed
+- **Focus files for updates**: activeContext.md and progress.md
+
+## Project Structure Patterns
+
+### Package Organization
+```
+com.example.demo/
+├── config/          # Configuration classes (Security, etc.)
+├── controller/      # MVC Controllers
+├── domain/          # Domain entities (User, Role, etc.)
+├── mapper/          # MyBatis interfaces and XML
+├── security/        # Security-related components
+└── service/         # Service layer (future)
+```
+
+### Naming Conventions
+- Controllers: `{Entity}Controller` (e.g., AdminController, UserController)
+- Mappers: `{Entity}Mapper` (interface) + `{Entity}Mapper.xml`
+- Security: `Custom{Feature}` (e.g., CustomUserDetailsService)
+- Templates: Follow URL path structure
+
+## Critical Implementation Paths
+
+### Authentication Flow
+1. User submits login form → Spring Security filter chain
+2. CustomUserDetailsService loads user from database via UserMapper
+3. Password verified with BCryptPasswordEncoder
+4. On success → CustomAuthenticationSuccessHandler
+5. Redirect based on role: ADMIN → `/admin/home`, USER → `/user/home`
+
+### Database Access Pattern
+- Always use MyBatis mapper interfaces
+- SQL queries in XML files (UserMapper.xml)
+- Keep domain objects framework-agnostic
+- Lombok for boilerplate reduction
+
+### Security Configuration
+- URL-based authorization in SecurityConfig
+- Role prefix: "ROLE_" (Spring Security convention)
+- BCrypt for password hashing
+- Custom success handler for role-based redirects
+
+## Technology Constraints
+
+### Java 21 Features
+- Use modern Java features where appropriate
+- Record types for DTOs (future use)
+- Pattern matching (when beneficial)
+- Text blocks for multi-line strings
+
+### Spring Boot 3.5.6
+- Use @Configuration classes over XML
+- Leverage auto-configuration
+- Follow Boot conventions for property files
+
+### MyBatis Patterns
+- Prefer XML mapping over annotations for complex queries
+- Use #{} for prepared statements (SQL injection protection)
+- Result maps for complex object mapping
+
+## Development Preferences
+
+### Code Organization
+- Keep controllers thin - delegate to services
+- Domain logic in domain objects or services, not controllers
+- Separate configuration by concern (Security, Database, etc.)
+
+### Error Handling
+- Use early returns to reduce nesting
+- Specific exception types over generic
+- Include context in error messages
+- Never expose stack traces to users
+
+### Testing Approach
+- Unit tests for business logic
+- Integration tests for database operations
+- Security tests for authorization rules
+- Test file naming: `{Feature}Test.java`
+
+## Future Feature Patterns
+
+### Batch Processing (To Be Implemented)
+- Service layer for batch orchestration
+- ProcessBuilder for external program execution
+- CompletableFuture for async tracking
+- REST API for status polling
+- Store execution history in database
+
+### Logging (To Be Implemented)
+- Logback with JSON formatting
+- Context information: user ID, request ID, session ID
+- Security events: login attempts, authorization failures
+- Never log personal information (passwords, PII)
+- Separate logger instances by concern
+
+## Git Workflow Reminders
+
+### Commit Strategy
+- One logical change per commit
+- Format: `<type>(<scope>): <subject>`
+- Types: feat, fix, docs, style, refactor, test, chore
+- Examples:
+  - `feat(batch): add batch execution service`
+  - `fix(security): correct role-based redirect logic`
+  - `docs(memory-bank): update progress with logging status`
+
+### Branch Naming
+- Pattern: `<type>/<issue-number>-<description>`
+- Examples:
+  - `feature/123-batch-execution`
+  - `fix/456-login-redirect`
+
+## Common Pitfalls to Avoid
+
+### Security
+- Never commit passwords or secrets
+- Always validate user input before processing
+- Escape data before sending to other systems
+- Use parameterized queries (MyBatis handles this)
+
+### Database
+- H2 is for development only - not production
+- Always define schema in schema.sql for reproducibility
+- Use CASCADE DELETE carefully on foreign keys
+
+### Spring Security
+- Remember role prefix "ROLE_" in configuration
+- Test authorization rules thoroughly
+- Don't bypass CSRF protection without good reason
+
+## Quick Reference
+
+### Running the Application
+```bash
+./mvnw spring-boot:run
+```
+
+### Running Tests
+```bash
+./mvnw test
+```
+
+### Building
+```bash
+./mvnw clean package
+```
+
+### Accessing H2 Console (if enabled)
+- URL: http://localhost:8080/h2-console
+- JDBC URL: jdbc:h2:mem:devdb
+- User: sa
+- Password: (empty)
+
+## Project Intelligence Notes
+
+### User Preferences Observed
+- Memory bank documentation is critical for context continuity
+- Comprehensive planning before implementation
+- English for all code and documentation
+- Defense industry security standards apply
+
+### Project Evolution
+- Started with basic authentication (completed)
+- Moving toward batch processing system
+- Logging infrastructure is next priority
+- Will need production database migration path
+
+## When Starting New Work
+
+1. Read all memory bank files
+2. Check progress.md for current status
+3. Review activeContext.md for recent changes and next steps
+4. Check specifications.md for requirements
+5. Follow coding standards in docs/rules/
+6. Update memory bank files as you progress
