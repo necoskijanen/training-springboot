@@ -73,4 +73,27 @@ public interface UserRepository {
      * @return ユーザリスト
      */
     List<User> findAll();
+
+    /**
+     * ロール名からロールIDを取得
+     * 
+     * @param name ロール名
+     * @return ロールID
+     */
+    Long findRoleIdByName(@Param("name") String name);
+
+    /**
+     * ユーザにロールを割り当てる
+     * 
+     * @param userId ユーザID
+     * @param roleId ロールID
+     */
+    void insertUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    /**
+     * ユーザのロール割り当てを削除
+     * 
+     * @param userId ユーザID
+     */
+    void deleteUserRoles(@Param("userId") Long userId);
 }

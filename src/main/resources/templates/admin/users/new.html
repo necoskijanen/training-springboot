@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ja">
+
+<head>
+    <title>ユーザ作成</title>
+    <th:block th:insert="~{fragments/header :: head}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/user-management.css}">
+</head>
+
+<body class="theme-admin">
+    <div th:replace="~{fragments/header :: header('ユーザ作成')}"></div>
+
+    <div class="content-wrapper">
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <main role="main">
+            <div class="user-form">
+                <form th:action="@{/admin/users}" th:object="${createUserRequest}" method="post">
+                    <!-- ✅ エラーメッセージを <form> の内側に移動 -->
+                    <div th:if="${#fields.hasErrors('*')}" class="error-message" role="alert">
+                        <ul>
+                            <li th:each="error : ${#fields.errors('*')}" th:text="${error}"></li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">ユーザ名 <span class="required">*</span></label>
+                        <input type="text" id="name" th:field="*{name}" required autofocus>
+                        <span th:if="${#fields.hasErrors('name')}" class="field-error" th:errors="*{name}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">メールアドレス <span class="required">*</span></label>
+                        <input type="email" id="email" th:field="*{email}" required>
+                        <span th:if="${#fields.hasErrors('email')}" class="field-error" th:errors="*{email}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">パスワード <span class="required">*</span></label>
+                        <input type="password" id="password" th:field="*{password}" required>
+                        <span th:if="${#fields.hasErrors('password')}" class="field-error"
+                            th:errors="*{password}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="admin">管理者権限</label>
+                        <input type="checkbox" id="admin" th:field="*{admin}">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">作成</button>
+                        <a href="#" th:href="@{/admin/users}" class="btn btn-secondary">キャンセル</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/header :: footer}"></div>
+</body>
+
+</html>

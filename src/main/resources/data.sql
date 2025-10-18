@@ -1,30 +1,29 @@
--- H2 DBはPostgreSQLのように自動シーケンスを生成しない場合があるため、明示的にIDを指定
-INSERT INTO user_master (id, name, email, password, is_active, created_at, updated_at)
+INSERT INTO user_master (name, email, password, is_active, admin, created_at, updated_at)
 VALUES
 (
-    1,
     'admin',
     'admin@example.com',
     '$2a$10$u/PayOaUO96YklC0trr9.ezsEw7pKNUmYQ1ZGI5zhf2NY1A/SMnd6', 
+    TRUE,
     TRUE,
     CURRENT_TIMESTAMP(),
     CURRENT_TIMESTAMP()
 )
 ,(
-    2,
     'user',
     'user@example.com',
     '$2a$10$D02/ZV6Wb7Bw1BjQ.sNumugMY3VYpPdN/aJOoiNow3FX0V1WO.Cmq',
     TRUE,
+    FALSE,
     CURRENT_TIMESTAMP(),
     CURRENT_TIMESTAMP()
 );
 
 -- ロールの投入
-INSERT INTO role_definition (id, name)
+INSERT INTO role_definition (name)
 VALUES 
- (1, 'ADMIN')
-,(2, 'USER')
+ ('ADMIN')
+,('USER')
 ;
 
 -- ユーザーロールの投入
