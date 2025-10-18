@@ -3,35 +3,21 @@
 
 <head>
     <title>USERホーム</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/user.css}">
+    <th:block th:insert="~{fragments/header :: head}"></th:block>
 </head>
 
-<body>
-    <header role="banner">
-        <div class="header-content">
-            <h1>ユーザーページ</h1>
-            <div class="user-info" aria-label="ユーザー情報">
-                <div class="user-icon">👤</div>
-                <div class="user-name">
-                    <span sec:authentication="name">ユーザー名</span>
-                </div>
-            </div>
-        </div>
-    </header>
+<body class="theme-user">
+    <div th:replace="~{fragments/header :: header('ユーザーページ')}"></div>
 
     <div class="content-wrapper">
-        <div th:replace="~{fragments/user-sidebar :: user-sidebar}"></div>
+        <div th:replace="~{fragments/user-sidebar :: sidebar}"></div>
 
         <main role="main">
             <h1>ようこそUSER！</h1>
         </main>
     </div>
 
-    <footer role="contentinfo">
-        <p>&copy; 2025 Training SpringBoot Application. All rights reserved.</p>
-    </footer>
+    <div th:replace="~{fragments/header :: footer}"></div>
 </body>
 
 </html>

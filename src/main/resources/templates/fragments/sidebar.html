@@ -16,6 +16,20 @@
             </li>
         </ul>
     </nav>
+
+    <nav th:fragment="user-sidebar" class="sidebar" role="navigation" aria-label="ユーザーメニュー">
+        <ul>
+            <li><a href="#" th:href="@{/user/home}">ホーム</a></li>
+            <li><a href="#" th:href="@{/user/notices}">お知らせ</a></li>
+            <li><a href="#" th:href="@{/user/profile}">プロフィール</a></li>
+            <li><a href="#" th:href="@{/user/settings}">設定</a></li>
+            <li>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit">ログアウト</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
 </body>
 
 </html>

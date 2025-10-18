@@ -6,11 +6,11 @@
     <th:block th:insert="~{fragments/header :: head}"></th:block>
 </head>
 
-<body>
+<body class="theme-admin">
     <div th:replace="~{fragments/header :: header('管理者ページ')}"></div>
 
     <div class="content-wrapper">
-        <div th:replace="~{fragments/sidebar :: admin-sidebar}"></div>
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
 
         <main role="main">
             <h1>ようこそADMIN！</h1>
