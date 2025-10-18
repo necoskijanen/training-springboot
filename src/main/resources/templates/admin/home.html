@@ -3,19 +3,24 @@
 
 <head>
     <title>ADMINホーム</title>
+    <th:block th:insert="~{fragments/header :: head}"></th:block>
 </head>
 
 <body>
-    <h1>ようこそADMIN！</h1>
+    <div th:replace="~{fragments/header :: header('管理者ページ')}"></div>
 
-    <p>
-        現在ログイン中のユーザー:
-        <span sec:authentication="name">ユーザー名</span>
-    </p>
+    <main>
+        <h1>ようこそADMIN！</h1>
 
-    <form th:action="@{/logout}" method="post">
-        <button type="submit">ログアウト</button>
-    </form>
+        <p>
+            現在ログイン中のユーザー:
+            <span sec:authentication="name">ユーザー名</span>
+        </p>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">ログアウト</button>
+        </form>
+    </main>
 </body>
 
 </html>
