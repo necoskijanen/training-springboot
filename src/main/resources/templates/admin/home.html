@@ -9,18 +9,22 @@
 <body>
     <div th:replace="~{fragments/header :: header('管理者ページ')}"></div>
 
-    <main role="main">
-        <h1>ようこそADMIN！</h1>
+    <div class="content-wrapper">
+        <div th:replace="~{fragments/sidebar :: admin-sidebar}"></div>
 
-        <p>
-            現在ログイン中のユーザー:
-            <span sec:authentication="name">ユーザー名</span>
-        </p>
+        <main role="main">
+            <h1>ようこそADMIN！</h1>
 
-        <form th:action="@{/logout}" method="post">
-            <button type="submit">ログアウト</button>
-        </form>
-    </main>
+            <p>
+                現在ログイン中のユーザー:
+                <span sec:authentication="name">ユーザー名</span>
+            </p>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">ログアウト</button>
+            </form>
+        </main>
+    </div>
 
     <div th:replace="~{fragments/header :: footer}"></div>
 </body>
