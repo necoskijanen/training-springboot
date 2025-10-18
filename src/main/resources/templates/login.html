@@ -1,60 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" data-theme="light">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン</title>
-    <!-- ローカルのPico.CSSを参照 -->
-    <link rel="stylesheet" th:href="@{/css/pico.min.css}">
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        main.container {
-            max-width: 500px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 
 <body>
-    <main class="container">
-        <article>
-            <hgroup>
+    <main class="login-container" role="main">
+        <div class="login-card">
+            <header class="login-header">
                 <h1>ログイン</h1>
-                <p>アカウント情報を入力してください</p>
-            </hgroup>
+                <p class="login-subtitle">Training SpringBoot Application</p>
+            </header>
 
-            <!-- エラーメッセージ表示 -->
-            <div th:if="${param.error}" role="alert">
-                <mark th:text="#{${session.errorMessageKey ?: 'login.error'}}"></mark>
+            <div th:if="${param.error}" class="alert alert-error" role="alert">
+                <mark th:text="#{${session.errorMessageKey ?: 'login.error'}}">エラーメッセージ</mark>
             </div>
 
-            <!-- ログアウトメッセージ表示 -->
-            <div th:if="${param.logout}" role="alert">
-                <ins th:text="#{login.logout}"></ins>
+            <div th:if="${param.logout}" class="alert alert-success" role="alert">
+                <ins th:text="#{login.logout}">ログアウトメッセージ</ins>
             </div>
 
-            <form th:action="@{/login}" method="post">
-                <label for="username">
-                    ユーザー名
-                    <input type="text" id="username" name="username" placeholder="メールアドレスを入力" autofocus="autofocus"
-                        required />
-                </label>
+            <form th:action="@{/login}" method="post" class="login-form">
+                <div class="form-group">
+                    <label for="username">ユーザー名</label>
+                    <input type="text" id="username" name="username" autocomplete="username" required autofocus
+                        aria-required="true" placeholder="メールアドレスを入力">
+                </div>
 
-                <label for="password">
-                    パスワード
-                    <input type="password" id="password" name="password" placeholder="パスワードを入力" required />
-                </label>
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" required
+                        aria-required="true" placeholder="パスワードを入力">
+                </div>
 
-                <button type="submit">ログイン</button>
+                <button type="submit" class="btn-login">ログイン</button>
             </form>
-        </article>
+        </div>
     </main>
+
+    <div th:replace="~{fragments/header :: footer}"></div>
 </body>
 
 </html>
