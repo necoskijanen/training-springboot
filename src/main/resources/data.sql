@@ -3,7 +3,7 @@ INSERT INTO user_master (id, name, email, password, is_active, created_at, updat
 VALUES
 (
     1,
-    'Admin User',
+    'admin',
     'admin@example.com',
     '$2a$10$u/PayOaUO96YklC0trr9.ezsEw7pKNUmYQ1ZGI5zhf2NY1A/SMnd6', 
     TRUE,
@@ -12,7 +12,7 @@ VALUES
 )
 ,(
     2,
-    'Regular User',
+    'user',
     'user@example.com',
     '$2a$10$D02/ZV6Wb7Bw1BjQ.sNumugMY3VYpPdN/aJOoiNow3FX0V1WO.Cmq',
     TRUE,

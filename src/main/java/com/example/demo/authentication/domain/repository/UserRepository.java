@@ -18,4 +18,12 @@ public interface UserRepository {
      * @return ユーザ
      */
     Optional<User> findByEmail(@Param("email") String email);
+
+    /**
+     * ユーザ名でユーザを検索
+     * 
+     * @param name ユーザ名
+     * @return ユーザ
+     */
+    Optional<User> findByName(@Param("name") String name);
 }

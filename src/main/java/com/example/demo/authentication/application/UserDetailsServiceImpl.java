@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     // 認証ロジックの実装
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByName(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
         List<Role> roles = user.getRoles();
 
@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .collect(Collectors.toList());
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                user.getName(),
                 user.getPassword(),
                 user.getIsActive(),
                 true, true, true,
