@@ -1,37 +1,60 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" data-theme="light">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン</title>
+    <!-- ローカルのPico.CSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/pico.min.css}">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        main.container {
+            max-width: 500px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>ログイン</h1>
+    <main class="container">
+        <article>
+            <hgroup>
+                <h1>ログイン</h1>
+                <p>アカウント情報を入力してください</p>
+            </hgroup>
 
-    <!-- エラーメッセージ表示 -->
-    <div th:if="${param.error}" style="color: red;">
-        <!-- セッションからメッセージキーを取得してmessages.propertiesから解決 -->
-        <p th:text="#{${session.errorMessageKey ?: 'login.error'}}"></p>
-    </div>
+            <!-- エラーメッセージ表示 -->
+            <div th:if="${param.error}" role="alert">
+                <mark th:text="#{${session.errorMessageKey ?: 'login.error'}}"></mark>
+            </div>
 
-    <!-- ログアウトメッセージ表示 -->
-    <div th:if="${param.logout}" style="color: green;">
-        <p th:text="#{login.logout}"></p>
-    </div>
+            <!-- ログアウトメッセージ表示 -->
+            <div th:if="${param.logout}" role="alert">
+                <ins th:text="#{login.logout}"></ins>
+            </div>
 
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label for="username">ユーザー名:</label>
-            <input type="text" id="username" name="username" autofocus="autofocus" />
-        </div>
-        <div>
-            <label for="password">パスワード:</label>
-            <input type="password" id="password" name="password" />
-        </div>
-        <div>
-            <button type="submit">ログイン</button>
-        </div>
-    </form>
+            <form th:action="@{/login}" method="post">
+                <label for="username">
+                    ユーザー名
+                    <input type="text" id="username" name="username" placeholder="メールアドレスを入力" autofocus="autofocus"
+                        required />
+                </label>
+
+                <label for="password">
+                    パスワード
+                    <input type="password" id="password" name="password" placeholder="パスワードを入力" required />
+                </label>
+
+                <button type="submit">ログイン</button>
+            </form>
+        </article>
+    </main>
 </body>
 
 </html>
