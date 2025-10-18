@@ -4,9 +4,11 @@ import com.example.demo.application.user.UserService;
 import com.example.demo.application.user.dto.CreateUserRequest;
 import com.example.demo.application.user.dto.UpdateUserRequest;
 import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.exception.UserDomainException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,6 +25,9 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     /**
      * 管理者ホーム画面を表示
@@ -66,7 +72,8 @@ public class AdminController {
     public String createUser(
             @Valid @ModelAttribute CreateUserRequest request,
             BindingResult result,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Locale locale) {
 
         if (result.hasErrors()) {
             log.debug("Validation errors: {}", result.getAllErrors());
@@ -77,9 +84,10 @@ public class AdminController {
             userService.createUser(request);
             redirectAttributes.addFlashAttribute("successMessage", "ユーザーを作成しました。");
             return "redirect:/admin/users";
-        } catch (IllegalArgumentException e) {
-            log.warn("User creation failed: {}", e.getMessage());
-            result.reject("error.user", e.getMessage());
+        } catch (UserDomainException e) {
+            log.warn("User creation failed: errorCode={}", e.getErrorCode());
+            String errorMessage = messageSource.getMessage(e.getErrorCode().getMessageKey(), null, locale);
+            result.reject("error.user", errorMessage);
             return "admin/users/new";
         }
     }
@@ -113,7 +121,8 @@ public class AdminController {
             @PathVariable Long id,
             @Valid @ModelAttribute UpdateUserRequest request,
             BindingResult result,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Locale locale) {
 
         request.setId(id);
 
@@ -126,9 +135,10 @@ public class AdminController {
             userService.updateUser(request);
             redirectAttributes.addFlashAttribute("successMessage", "ユーザーを更新しました。");
             return "redirect:/admin/users";
-        } catch (IllegalArgumentException e) {
-            log.warn("User update failed: {}", e.getMessage());
-            result.reject("error.user", e.getMessage());
+        } catch (UserDomainException e) {
+            log.warn("User update failed: errorCode={}", e.getErrorCode());
+            String errorMessage = messageSource.getMessage(e.getErrorCode().getMessageKey(), null, locale);
+            result.reject("error.user", errorMessage);
             return "admin/users/edit";
         }
     }

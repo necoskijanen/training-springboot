@@ -3,6 +3,8 @@ package com.example.demo.application.user;
 import com.example.demo.application.user.dto.CreateUserRequest;
 import com.example.demo.application.user.dto.UpdateUserRequest;
 import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.exception.UserErrorCode;
+import com.example.demo.domain.user.exception.UserDomainException;
 import com.example.demo.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class UserService {
      * 
      * @param request ユーザ作成リクエスト
      * @return 作成されたユーザ
-     * @throws IllegalArgumentException ユーザ名またはメールアドレスが既に存在する場合
+     * @throws UserDomainException ユーザ名が既に存在する場合
      */
     public User createUser(CreateUserRequest request) {
         log.info("Creating user: name={}, email={}", request.getName(), request.getEmail());
@@ -62,7 +64,7 @@ public class UserService {
         // ユーザ名が既に存在するか確認
         if (userRepository.existsByName(request.getName())) {
             log.warn("User creation failed: name already exists: {}", request.getName());
-            throw new IllegalArgumentException("指定されたユーザ名は既に使用されています。");
+            throw new UserDomainException(UserErrorCode.DUPLICATE_NAME);
         }
 
         // ユーザオブジェクトを構築
@@ -90,7 +92,7 @@ public class UserService {
      * 
      * @param request ユーザ更新リクエスト
      * @return 更新されたユーザ
-     * @throws IllegalArgumentException ユーザが見つからない、またはメールアドレスが既に存在する場合
+     * @throws UserDomainException ユーザが見つからない、またはビジネスルール違反の場合
      */
     public User updateUser(UpdateUserRequest request) {
         log.info("Updating user: id={}", request.getId());
@@ -99,21 +101,21 @@ public class UserService {
         User existingUser = userRepository.findById(request.getId())
                 .orElseThrow(() -> {
                     log.warn("User update failed: user not found with id: {}", request.getId());
-                    return new IllegalArgumentException("指定されたユーザが見つかりません。");
+                    return new UserDomainException(UserErrorCode.USER_NOT_FOUND);
                 });
 
         // ユーザ名が変更されている場合、新しいユーザ名が既に存在するか確認
         if (!existingUser.getName().equals(request.getName())) {
             if (userRepository.existsByName(request.getName())) {
                 log.warn("User update failed: name already exists: {}", request.getName());
-                throw new IllegalArgumentException("指定されたユーザ名は既に使用されています。");
+                throw new UserDomainException(UserErrorCode.DUPLICATE_NAME);
             }
         }
 
         // 管理者が自身の権限を削除しようとしていないか確認
         if (existingUser.getId().equals(request.getId()) && existingUser.getAdmin() && !request.getAdmin()) {
             log.warn("User update failed: admin user cannot revoke own admin rights: id={}", request.getId());
-            throw new IllegalArgumentException("管理者は自身の管理者権限を削除できません。");
+            throw new UserDomainException(UserErrorCode.CANNOT_REVOKE_OWN_ADMIN_RIGHTS);
         }
 
         // ユーザオブジェクトを更新
