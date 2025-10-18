@@ -1,21 +1,37 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ja">
 
 <head>
     <title>USERホーム</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/user.css}">
 </head>
 
 <body>
-    <h1>ようこそUSER！</h1>
+    <header role="banner">
+        <div class="header-content">
+            <h1>ユーザーページ</h1>
+            <div class="user-info" aria-label="ユーザー情報">
+                <div class="user-icon">👤</div>
+                <div class="user-name">
+                    <span sec:authentication="name">ユーザー名</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <p>
-        現在ログイン中のユーザー:
-        <span sec:authentication="name">ユーザー名</span>
-    </p>
+    <div class="content-wrapper">
+        <div th:replace="~{fragments/user-sidebar :: user-sidebar}"></div>
 
-    <form th:action="@{/logout}" method="post">
-        <button type="submit">ログアウト</button>
-    </form>
+        <main role="main">
+            <h1>ようこそUSER！</h1>
+        </main>
+    </div>
+
+    <footer role="contentinfo">
+        <p>&copy; 2025 Training SpringBoot Application. All rights reserved.</p>
+    </footer>
 </body>
 
 </html>

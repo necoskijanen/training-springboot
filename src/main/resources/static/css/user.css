@@ -1,0 +1,132 @@
+/* ベースリセット */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+}
+
+header {
+    background-color: #b3d9ff;
+    color: #003366;
+    padding: 1rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+header h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.user-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    filter: grayscale(100%) brightness(0%);
+}
+
+.user-name {
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.content-wrapper {
+    display: flex;
+    flex: 1;
+    width: 100%;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #e6f2ff;
+    padding: 1rem 0;
+    border-right: 1px solid #99ccff;
+    flex-shrink: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar li {
+    margin: 0;
+}
+
+.sidebar a,
+.sidebar .logout-form button {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #003366;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.sidebar a:hover,
+.sidebar .logout-form button:hover {
+    background-color: #cce5ff;
+}
+
+.sidebar a:focus-visible,
+.sidebar .logout-form button:focus-visible {
+    outline: 2px solid #0066cc;
+    outline-offset: -2px;
+}
+
+.sidebar .logout-form {
+    margin: 0;
+}
+
+main {
+    flex: 1;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+footer {
+    background-color: #b3d9ff;
+    color: #003366;
+    padding: 1rem;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.75rem;
+    text-align: left;
+    padding: 0 1rem;
+}
+
+/* フォーカス表示の改善 */
+button:focus-visible {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+}
