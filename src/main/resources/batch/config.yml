@@ -1,0 +1,29 @@
+batch:
+  jobs:
+    - id: wait_time_test
+      name: 待機テスト（成功）
+      description: 3回ループして標準出力に出力します
+      enabled: true
+      command: wait_time
+      arguments:
+        - "3"
+        - "0"
+        - "0"
+      environment:
+        JAVA_HOME: /usr/lib/jvm/java-11-openjdk
+      timeout: 60
+      workingDirectory: src/main/resources/batch
+
+    - id: wait_time_error
+      name: 待機テスト（エラー）
+      description: 2回ループして標準エラーに出力し、終了コード1で終了します
+      enabled: true
+      command: wait_time
+      arguments:
+        - "2"
+        - "1"
+        - "1"
+      environment:
+        JAVA_HOME: /usr/lib/jvm/java-11-openjdk
+      timeout: 60
+      workingDirectory: src/main/resources/batch

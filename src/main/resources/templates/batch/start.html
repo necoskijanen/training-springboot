@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ja">
+
+<head>
+    <title>バッチ起動画面</title>
+    <th:block th:insert="~{fragments/header :: head}"></th:block>
+</head>
+
+<body class="theme-admin">
+    <div th:replace="~{fragments/header :: header('')}"></div>
+
+    <div class="content-wrapper">
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <main role="main">
+            <h1>バッチ起動画面</h1>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/header :: footer}"></div>
+</body>
+
+</html>

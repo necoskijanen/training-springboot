@@ -25,6 +25,9 @@ spring:
   thymeleaf:
     cache: false
 
+  config:
+    import: classpath:batch/config.yml
+
 mybatis:
   type-aliases-package: com.example.demo.domain.user
   mapper-locations: 
