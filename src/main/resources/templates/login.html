@@ -8,12 +8,15 @@
 <body>
     <h1>ログイン</h1>
 
+    <!-- エラーメッセージ表示 -->
     <div th:if="${param.error}" style="color: red;">
-        ユーザー名またはパスワードが正しくありません。
+        <!-- セッションからメッセージキーを取得してmessages.propertiesから解決 -->
+        <p th:text="#{${session.errorMessageKey ?: 'login.error'}}"></p>
     </div>
 
+    <!-- ログアウトメッセージ表示 -->
     <div th:if="${param.logout}" style="color: green;">
-        ログアウトしました。
+        <p th:text="#{login.logout}"></p>
     </div>
 
     <form th:action="@{/login}" method="post">

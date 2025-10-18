@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import com.example.demo.security.CustomAuthenticationFailureHandler;
 import com.example.demo.security.CustomAuthenticationSuccessHandler;
 
 @Configuration
@@ -26,6 +27,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CustomAuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
@@ -37,7 +43,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler(customAuthenticationSuccessHandler())
-                        .failureUrl("/login?error")
+                        .failureHandler(customAuthenticationFailureHandler())
                         .permitAll())
                 .logout(logout -> logout
                         .permitAll());

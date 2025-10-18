@@ -3,6 +3,7 @@ package com.example.demo.security;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.domain.Role;
 import com.example.demo.domain.User;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,8 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         @Override
         public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
                 User user = userMapper.findByEmail(email)
-                                .orElseThrow(() -> new UsernameNotFoundException(
-                                                "User not found with email: " + email));
+                                .orElseThrow(() -> new UsernameNotFoundException(email));
                 List<Role> roles = user.getRoles();
 
                 // Spring SecurityのUserDetailsオブジェクトを生成
