@@ -9,9 +9,14 @@
     </th:block>
 
     <header th:fragment="header(pageTitle)" role="banner">
-        <h1 th:text="${pageTitle}">ページタイトル</h1>
-        <div class="user-info" aria-label="ユーザー情報">
-            ログイン中: <span sec:authentication="name">ユーザー名</span>
+        <div class="header-content">
+            <h1 th:text="${pageTitle}">ページタイトル</h1>
+            <div class="user-info" aria-label="ユーザー情報">
+                <div class="user-icon">👤</div>
+                <div class="user-name">
+                    <span sec:authentication="name">ユーザー名</span>
+                </div>
+            </div>
         </div>
     </header>
 
