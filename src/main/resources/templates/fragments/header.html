@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ja">
 
 <body>
     <th:block th:fragment="head">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" th:href="@{/css/header.css}">
     </th:block>
 
-    <header th:fragment="header(pageTitle)">
+    <header th:fragment="header(pageTitle)" role="banner">
         <h1 th:text="${pageTitle}">ページタイトル</h1>
-        <div class="user-info">
+        <div class="user-info" aria-label="ユーザー情報">
             ログイン中: <span sec:authentication="name">ユーザー名</span>
         </div>
     </header>
 
-    <footer th:fragment="footer">
+    <footer th:fragment="footer" role="contentinfo">
         <p>&copy; 2025 Training SpringBoot Application. All rights reserved.</p>
     </footer>
 </body>
