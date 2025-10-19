@@ -1,4 +1,5 @@
 -- テーブルが既に存在する場合は削除 (開発・テスト用)
+DROP TABLE IF EXISTS batch_execution_history;
 DROP TABLE IF EXISTS user_role;
 DROP TABLE IF EXISTS role_definition;
 DROP TABLE IF EXISTS user_master;
@@ -29,3 +30,21 @@ CREATE TABLE user_role (
     FOREIGN KEY (user_id) REFERENCES user_master(id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES role_definition(id)
 );
+
+-- バッチ実行履歴テーブルの作成
+CREATE TABLE batch_execution_history (
+    id VARCHAR(36) PRIMARY KEY,
+    job_id VARCHAR(100) NOT NULL,
+    job_name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    exit_code INT,
+    user_id BIGINT NOT NULL,
+    start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user_master(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_batch_job_id ON batch_execution_history(job_id);
+CREATE INDEX idx_batch_user_id ON batch_execution_history(user_id);
+CREATE INDEX idx_batch_start_time ON batch_execution_history(start_time);

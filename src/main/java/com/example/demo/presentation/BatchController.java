@@ -1,34 +1,47 @@
 package com.example.demo.presentation;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
-import com.example.demo.config.BatchConfig;
-
+/**
+ * Batch Controller
+ * バッチ処理画面のルーティングを担当するコントローラー
+ */
 @Controller
-@Slf4j
+@RequestMapping("/batch")
 public class BatchController {
 
-    @Autowired
-    private BatchConfig batchConfig;
-
     /**
-     * バッチ起動画面を表示
+     * Admin - バッチ起動画面
      */
-    @GetMapping({ "/admin/batch/start", "/user/batch/start" })
-    public String launchBatchForm(Model model) {
+    @GetMapping("/admin/start")
+    public String adminBatchStart() {
         return "batch/start";
     }
 
     /**
-     * バッチ履歴画面を表示
+     * Admin - バッチ履歴画面
      */
-    @GetMapping({ "/admin/batch/history", "/user/batch/history" })
-    public String showBatchHistoryForm(Model model) {
-        return "batch/history";
+    @GetMapping("/admin/history")
+    public ModelAndView adminBatchHistory() {
+        return new ModelAndView("batch/history");
+    }
+
+    /**
+     * User - バッチ起動画面
+     */
+    @GetMapping("/user/start")
+    public ModelAndView userBatchStart() {
+        return new ModelAndView("batch/start");
+    }
+
+    /**
+     * User - バッチ履歴画面
+     */
+    @GetMapping("/user/history")
+    public ModelAndView userBatchHistory() {
+        return new ModelAndView("batch/history");
     }
 }

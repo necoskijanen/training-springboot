@@ -37,6 +37,16 @@ public class AdminController {
         return "admin/home";
     }
 
+    @GetMapping("/batch/start")
+    public String adminBatchStart() {
+        return "batch/start";
+    }
+
+    @GetMapping("/batch/history")
+    public String adminBatchHistory() {
+        return "batch/history";
+    }
+
     /**
      * ユーザ検索・一覧画面を表示
      */

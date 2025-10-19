@@ -4,6 +4,9 @@
 <head>
     <title>バッチ起動画面</title>
     <th:block th:insert="~{fragments/header :: head}"></th:block>
+    <link rel="stylesheet" href="/css/batch/start.css">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
 </head>
 
 <body class="theme-admin">
@@ -14,10 +17,74 @@
 
         <main role="main">
             <h1>バッチ起動画面</h1>
+
+            <!-- アラートメッセージ -->
+            <div id="alertContainer"></div>
+
+            <!-- バッチ実行フォーム -->
+            <div class="batch-form">
+                <div class="form-group">
+                    <label for="jobSelect">実行するジョブを選択してください</label>
+                    <select id="jobSelect" onchange="onJobChanged()">
+                        <option value="">-- ジョブを選択 --</option>
+                    </select>
+                </div>
+
+                <h3>ジョブパラメータ</h3>
+                <table class="parameters-table" id="parametersTable">
+                    <thead>
+                        <tr>
+                            <th>パラメータ名</th>
+                            <th>値</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2" style="text-align: center; color: #999;">ジョブを選択してください</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="button-group">
+                    <button type="button" class="btn-primary" id="executeBtn" onclick="executeBatch()"
+                        disabled>実行</button>
+                </div>
+            </div>
+
+            <!-- バッチ実行履歴セクション -->
+            <div class="history-section">
+                <h2>実行履歴</h2>
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>実行ID</th>
+                            <th>ジョブ名</th>
+                            <th>開始時刻</th>
+                            <th>終了時刻</th>
+                            <th>ステータス</th>
+                            <th>終了コード</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #999;">履歴はまだありません</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ページネーション -->
+                <div class="pagination">
+                    <button id="prevBtn" onclick="loadHistory(currentPage - 1)" disabled>&lt; 前へ</button>
+                    <span id="pageInfo">ページ: 1</span>
+                    <button id="nextBtn" onclick="loadHistory(currentPage + 1)">次へ &gt;</button>
+                </div>
+            </div>
         </main>
     </div>
 
     <div th:replace="~{fragments/header :: footer}"></div>
+
+    <script src="/js/batch/start.js"></script>
 </body>
 
 </html>

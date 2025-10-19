@@ -109,4 +109,17 @@ public class AuthenticationUtil {
         }
         return false;
     }
+
+    /**
+     * 認証済みユーザーのユーザー名を取得
+     * 
+     * @param authentication 認証情報
+     * @return ユーザー名
+     */
+    public static String getCurrentUsername(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return authentication.getName();
+    }
 }
