@@ -6,25 +6,25 @@
 }
 
 .search-form {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 15px;
-    margin-bottom: 15px;
 }
 
-.search-form>.form-group:nth-child(4),
-.search-form>.form-group:nth-child(5) {
-    grid-column: auto;
+.search-conditions {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
 }
 
 @media (max-width: 1024px) {
-    .search-form {
-        grid-template-columns: repeat(2, 1fr);
+    .search-conditions {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .search-form {
+    .search-conditions {
         grid-template-columns: 1fr;
     }
 }

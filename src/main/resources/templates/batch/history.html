@@ -22,36 +22,38 @@
                 <div class="error-message" id="errorMessage"></div>
 
                 <form id="searchForm" class="search-form">
-                    <div class="form-group">
-                        <label for="userId">実行ユーザ</label>
-                        <select id="userId" class="admin-only">
-                            <option value="">すべてのユーザー</option>
-                        </select>
-                    </div>
+                    <div class="search-conditions">
+                        <div class="form-group">
+                            <label for="userId">実行ユーザ</label>
+                            <select id="userId" class="admin-only">
+                                <option value="">すべてのユーザー</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="status">ステータス</label>
-                        <select id="status">
-                            <option value="">すべて</option>
-                            <option value="RUNNING">実行中</option>
-                            <option value="COMPLETED_SUCCESS">成功</option>
-                            <option value="FAILED">失敗</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="status">ステータス</label>
+                            <select id="status">
+                                <option value="">すべて</option>
+                                <option value="RUNNING">実行中</option>
+                                <option value="COMPLETED_SUCCESS">成功</option>
+                                <option value="FAILED">失敗</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="jobName">ジョブ名</label>
-                        <input type="text" id="jobName" placeholder="入力不要">
-                    </div>
+                        <div class="form-group">
+                            <label for="jobName">ジョブ名</label>
+                            <input type="text" id="jobName" placeholder="入力不要">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="startDateFrom">開始日時</label>
-                        <input type="datetime-local" id="startDateFrom" placeholder="yyyy-mm-dd hh:mm:ss">
-                    </div>
+                        <div class="form-group">
+                            <label for="startDateFrom">開始日時</label>
+                            <input type="datetime-local" id="startDateFrom" placeholder="yyyy-mm-dd hh:mm:ss">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="endDateTo">終了日時</label>
-                        <input type="datetime-local" id="endDateTo" placeholder="yyyy-mm-dd hh:mm:ss">
+                        <div class="form-group">
+                            <label for="endDateTo">終了日時</label>
+                            <input type="datetime-local" id="endDateTo" placeholder="yyyy-mm-dd hh:mm:ss">
+                        </div>
                     </div>
 
                     <div class="search-buttons">

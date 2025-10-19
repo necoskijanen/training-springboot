@@ -20,15 +20,19 @@ function initializeSearch() {
 }
 
 function checkAdminStatus() {
-    const userSelectionGroup = document.getElementById('userSelectionGroup');
+    const userId = document.getElementById('userId');
     const userHeaderCell = document.getElementById('userHeaderCell');
 
     // Check current URL path to determine role
     const path = window.location.pathname;
     const isAdmin = path.includes('/admin/');
 
-    if (isAdmin) {
-        userSelectionGroup.classList.add('visible');
+    if (isAdmin && userId) {
+        // Show the user selection field by removing admin-only class restriction
+        const parentGroup = userId.parentElement;
+        if (parentGroup && parentGroup.classList.contains('admin-only')) {
+            parentGroup.classList.add('visible');
+        }
         userHeaderCell.style.display = 'table-cell';
     }
 }
