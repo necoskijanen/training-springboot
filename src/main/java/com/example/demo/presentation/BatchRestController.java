@@ -200,21 +200,30 @@ public class BatchRestController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) LocalDateTime startDateFrom,
             @RequestParam(required = false) LocalDateTime endDateTo,
-            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String userName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("Search batch history: jobName={}, status={}, startDateFrom={}, endDateTo={}, page={}, size={}",
-                jobName, status, startDateFrom, endDateTo, page, size);
+        log.info(
+                "Search batch history: jobName={}, status={}, startDateFrom={}, endDateTo={}, userName={}, page={}, size={}",
+                jobName, status, startDateFrom, endDateTo, userName, page, size);
 
         Long currentUserId = authenticationUtil.getCurrentUserId();
         if (currentUserId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // 一般ユーザーの場合、userIdは自分に固定
+        // 一般ユーザーの場合、searchUserIdは自分に固定
+        // 管理者の場合、userNameが指定されていなければ全員検索
         Long searchUserId = currentUserId;
-        if (authenticationUtil.hasAdminRole() && userId != null) {
-            searchUserId = userId;
+        if (authenticationUtil.hasAdminRole()) {
+            // ユーザー名が指定されている場合、ユーザーIDに変換
+            if (userName != null && !userName.trim().isEmpty()) {
+                searchUserId = userRepository.findByName(userName)
+                        .map(user -> user.getId())
+                        .orElse(null);
+            } else {
+                searchUserId = null; // null = all users
+            }
         }
 
         // ページネーション用のオフセット・リミットを計算
@@ -234,9 +243,9 @@ public class BatchRestController {
                 .map(exec -> {
                     // 一般ユーザーの場合、ユーザー名は不要（自分のデータのみ）
                     // 管理者の場合、ユーザー名を取得
-                    String userName = null;
+                    String displayUserName = null;
                     if (authenticationUtil.hasAdminRole()) {
-                        userName = userRepository.findById(exec.getUserId())
+                        displayUserName = userRepository.findById(exec.getUserId())
                                 .map(user -> user.getName())
                                 .orElse("Unknown");
                     }
@@ -247,7 +256,7 @@ public class BatchRestController {
                             .status(exec.getStatus())
                             .exitCode(exec.getExitCode())
                             .userId(exec.getUserId())
-                            .userName(userName)
+                            .userName(displayUserName)
                             .startTime(exec.getStartTime())
                             .endTime(exec.getEndTime())
                             .build();

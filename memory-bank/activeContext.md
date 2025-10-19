@@ -298,36 +298,40 @@
   - Both roles: `/api/batch/**` (batch REST API)
 - **Timeout Configuration**: 60 seconds per job (configured in config.yml)
 
-### 2025/10/19 - General User Batch Access - COMPLETED ✅
+### 2025/10/19 - General User Batch Access & Admin Search - COMPLETED ✅
 
 **Modified Files:**
-- BatchController.java, SecurityConfig.java, batch/start.html, batch/history.html
+- BatchController.java, SecurityConfig.java
+- batch/start.html, batch/history.html
+- BatchRestController.java, batch/history.js
 
-**Root Cause:** ユーザーがバッチ画面に遷移後、admin-sidebar固定のため管理者用リンク(/admin)が表示され権限エラーが発生
+**Key Changes:**
 
-**Changes Made:**
-
-1. **BatchController Route Restructuring**
-   - Removed `@RequestMapping("/batch")` class-level mapping  
+1. **Route Restructuring**
+   - Removed class-level `@RequestMapping("/batch")`
    - Updated routes: `/admin/batch/start`, `/admin/batch/history`, `/user/batch/start`, `/user/batch/history`
 
-2. **SecurityConfig Authorization Update**
-   - `/admin/batch/**` → `hasRole("ADMIN")`
-   - `/user/batch/**` → `hasAnyRole("USER", "ADMIN")`
-   - `/api/batch/**` → `hasAnyRole("USER", "ADMIN")`
+2. **Security Configuration**
+   - `/user/batch/**` → USER/ADMIN roles
+   - `/api/batch/**` → USER/ADMIN roles
 
-3. **Template Sidebar Conditional Rendering** ← KEY FIX
-   - batch/start.html: Added `sec:authorize` to conditionally display sidebars
-     - `hasRole('ADMIN')` → admin-sidebar
-     - `hasRole('USER') and !hasRole('ADMIN')` → user-sidebar
-   - batch/history.html: Same conditional sidebar rendering
+3. **Template Sidebar & Theme Conditional Rendering**
+   - batch/start.html: `sec:authorize` + `th:class` for role-based sidebar & theme switching
+   - batch/history.html: Same approach
 
-**Result:**
-- ✅ General users can access `/user/batch/start` and `/user/batch/history`
-- ✅ Correct sidebar displayed based on user role
-- ✅ All navigation links point to correct role-specific paths
-- ✅ No more permission errors from sidebar links
-- ✅ Color theme automatically switches based on user role (theme-admin / theme-user)
+4. **Admin-Only User Name Search**
+   - BatchRestController: Added `userName` parameter to search API
+   - Username → User ID conversion via UserRepository
+   - batch/history.html: Changed userId field to text input with id="userId" and placeholder
+   - batch/history.js: Role-based field visibility + username-only search (no ID)
+
+**Final Result:**
+- ✅ General users access `/user/batch/*` without errors
+- ✅ General users see only their own batch history
+- ✅ Correct sidebar & theme per role
+- ✅ Admin can search by user name (no ID visible to users)
+- ✅ Admin sees all users' batch history with user name column
+- ✅ Permission errors completely resolved
 
 ### Batch Start Screen Specification (確定: 2025/10/19)
 

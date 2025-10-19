@@ -21,19 +21,23 @@ function initializeSearch() {
 
 function checkAdminStatus() {
     const userId = document.getElementById('userId');
+    const userSearchGroup = document.getElementById('userSearchGroup');
     const userHeaderCell = document.getElementById('userHeaderCell');
 
     // Check current URL path to determine role
     const path = window.location.pathname;
     const isAdmin = path.includes('/admin/');
 
-    if (isAdmin && userId) {
-        // Show the user selection field by removing admin-only class restriction
-        const parentGroup = userId.parentElement;
-        if (parentGroup && parentGroup.classList.contains('admin-only')) {
-            parentGroup.classList.add('visible');
-        }
+    if (isAdmin && userId && userSearchGroup) {
+        // Show and enable userId field for admin users
+        userId.disabled = false;
+        userSearchGroup.style.display = 'block';
         userHeaderCell.style.display = 'table-cell';
+    } else if (userId && userSearchGroup) {
+        // Hide and disable userId field for non-admin users
+        userId.disabled = true;
+        userId.value = '';
+        userSearchGroup.style.display = 'none';
     }
 }
 
@@ -55,7 +59,7 @@ function performSearch() {
     const status = document.getElementById('status').value;
     const startDateFrom = document.getElementById('startDateFrom').value;
     const endDateTo = document.getElementById('endDateTo').value;
-    const userId = document.getElementById('userId').value;
+    const userNameOrId = document.getElementById('userId').value.trim();
 
     showLoading(true);
     hideError();
@@ -75,8 +79,8 @@ function performSearch() {
     if (endDateTo) {
         params.append('endDateTo', endDateTo);
     }
-    if (userId) {
-        params.append('userId', userId);
+    if (userNameOrId) {
+        params.append('userName', userNameOrId);
     }
 
     params.append('page', 0);
@@ -185,7 +189,7 @@ function goToPage(pageNumber) {
     const status = document.getElementById('status').value;
     const startDateFrom = document.getElementById('startDateFrom').value;
     const endDateTo = document.getElementById('endDateTo').value;
-    const userId = document.getElementById('userId').value;
+    const userNameOrId = document.getElementById('userId').value.trim();
 
     showLoading(true);
     hideError();
@@ -205,8 +209,8 @@ function goToPage(pageNumber) {
     if (endDateTo) {
         params.append('endDateTo', endDateTo);
     }
-    if (userId) {
-        params.append('userId', userId);
+    if (userNameOrId) {
+        params.append('userName', userNameOrId);
     }
 
     params.append('page', pageNumber - 1);
@@ -287,9 +291,10 @@ function clearForm() {
     document.getElementById('endDateTo').value = '';
     document.getElementById('userId').value = '';
 
-    document.getElementById('resultsContainer').style.display = 'none';
-    document.getElementById('noResults').style.display = 'none';
     hideError();
+
+    // クリア後、条件なしで検索の1ページ目を取得
+    performSearch();
 }
 
 function showError(message) {
