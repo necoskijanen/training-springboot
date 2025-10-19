@@ -1,6 +1,7 @@
 package com.example.demo.domain.batch;
 
 import com.example.demo.domain.batch.exception.BatchDomainException;
+import com.example.demo.domain.batch.exception.BatchErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,7 +55,7 @@ public class BatchExecution {
      */
     public void completeSuccessfully() {
         if (this.status != ExecutionStatus.RUNNING) {
-            throw new BatchDomainException("バッチ実行は実行中でないため、完了させることはできません。現在の状態: " + this.status.getDisplayName());
+            throw new BatchDomainException(BatchErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = ExecutionStatus.COMPLETED_SUCCESS;
         this.exitCode = 0;
@@ -69,10 +70,10 @@ public class BatchExecution {
      */
     public void completeFailed(int exitCode) {
         if (this.status != ExecutionStatus.RUNNING) {
-            throw new BatchDomainException("バッチ実行は実行中でないため、完了させることはできません。現在の状態: " + this.status.getDisplayName());
+            throw new BatchDomainException(BatchErrorCode.INVALID_STATUS_TRANSITION);
         }
         if (exitCode == 0) {
-            throw new BatchDomainException("失敗時の終了コードは0以外である必要があります。指定値: " + exitCode);
+            throw new BatchDomainException(BatchErrorCode.BATCH_EXECUTION_FAILED);
         }
         this.status = ExecutionStatus.FAILED;
         this.exitCode = exitCode;
@@ -86,7 +87,7 @@ public class BatchExecution {
      */
     public void timeout() {
         if (this.status != ExecutionStatus.RUNNING) {
-            throw new BatchDomainException("バッチ実行は実行中でないため、タイムアウトさせることはできません。現在の状態: " + this.status.getDisplayName());
+            throw new BatchDomainException(BatchErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = ExecutionStatus.FAILED;
         this.exitCode = -1; // タイムアウトを示す特殊な終了コード

@@ -48,13 +48,15 @@ public class BatchService {
      * 
      * @param jobId ジョブID
      * @return 実行ID
+     * @throws com.example.demo.domain.batch.exception.BatchDomainException ジョブが見つからない場合
      */
     public String startBatch(String jobId) {
         log.info("Starting batch execution for job: {}", jobId);
 
         // ジョブ設定を取得
         BatchConfig.Job job = getJobByIdOptional(jobId)
-                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobId));
+                .orElseThrow(() -> new com.example.demo.domain.batch.exception.BatchDomainException(
+                        com.example.demo.domain.batch.exception.BatchErrorCode.JOB_NOT_FOUND));
 
         // ユーザーIDを取得
         Long userId = authenticationUtil.getCurrentUserId();
@@ -118,7 +120,11 @@ public class BatchService {
         }
 
         // メモリにない場合（または完了した場合）はDBから取得
-        return batchExecutionRepository.findById(executionId);
+        return batchExecutionRepository.findById(executionId)
+                .or(() -> {
+                    log.warn("Batch execution not found: {}", executionId);
+                    return Optional.empty();
+                });
     }
 
     /**
