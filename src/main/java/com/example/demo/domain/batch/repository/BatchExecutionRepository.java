@@ -53,4 +53,40 @@ public interface BatchExecutionRepository {
      * @return 総件数
      */
     long countByUserId(Long userId);
+
+    /**
+     * 検索条件でバッチ実行レコードを検索する
+     * 
+     * @param userId        ユーザーID（一般ユーザのフィルタリング用、管理者の場合はnull）
+     * @param jobName       ジョブ名（部分一致）
+     * @param status        ステータス
+     * @param startDateFrom 開始日時（開始）
+     * @param startDateTo   開始日時（終了）
+     * @param endDateFrom   終了日時（開始）
+     * @param endDateTo     終了日時（終了）
+     * @param offset        オフセット
+     * @param limit         件数制限
+     * @return バッチ実行レコードのリスト
+     */
+    List<BatchExecution> searchBatchExecution(@Param("userId") Long userId, @Param("jobName") String jobName,
+            @Param("status") String status, @Param("startDateFrom") Object startDateFrom,
+            @Param("startDateTo") Object startDateTo, @Param("endDateFrom") Object endDateFrom,
+            @Param("endDateTo") Object endDateTo, @Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     * 検索条件でバッチ実行レコードの総件数を取得する
+     * 
+     * @param userId        ユーザーID（一般ユーザのフィルタリング用、管理者の場合はnull）
+     * @param jobName       ジョブ名（部分一致）
+     * @param status        ステータス
+     * @param startDateFrom 開始日時（開始）
+     * @param startDateTo   開始日時（終了）
+     * @param endDateFrom   終了日時（開始）
+     * @param endDateTo     終了日時（終了）
+     * @return 総件数
+     */
+    long countBatchExecution(@Param("userId") Long userId, @Param("jobName") String jobName,
+            @Param("status") String status, @Param("startDateFrom") Object startDateFrom,
+            @Param("startDateTo") Object startDateTo, @Param("endDateFrom") Object endDateFrom,
+            @Param("endDateTo") Object endDateTo);
 }

@@ -74,4 +74,87 @@
         WHERE user_id = #{userId}
     </select>
 
+    <select id="searchBatchExecution" resultType="com.example.demo.domain.batch.BatchExecution">
+        SELECT
+            id,
+            job_id as jobId,
+            job_name as jobName,
+            status,
+            exit_code as exitCode,
+            user_id as userId,
+            start_time as startTime,
+            end_time as endTime,
+            created_at as createdAt
+        FROM batch_execution_history
+        <where>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+            <if test="jobName != null and jobName != ''">
+                AND job_name LIKE CONCAT('%', #{jobName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="startDateFrom != null">
+                <![CDATA[
+                AND DATE(start_time) >= #{startDateFrom}
+                ]]>
+            </if>
+            <if test="startDateTo != null">
+                <![CDATA[
+                AND DATE(start_time) <= #{startDateTo}
+                ]]>
+            </if>
+            <if test="endDateFrom != null">
+                <![CDATA[
+                AND DATE(end_time) >= #{endDateFrom}
+                ]]>
+            </if>
+            <if test="endDateTo != null">
+                <![CDATA[
+                AND DATE(end_time) <= #{endDateTo}
+                ]]>
+            </if>
+        </where>
+        ORDER BY end_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countBatchExecution" resultType="long">
+        SELECT COUNT(*)
+        FROM batch_execution_history
+        <where>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+            <if test="jobName != null and jobName != ''">
+                AND job_name LIKE CONCAT('%', #{jobName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="startDateFrom != null">
+                <![CDATA[
+                AND DATE(start_time) >= #{startDateFrom}
+                ]]>
+            </if>
+            <if test="startDateTo != null">
+                <![CDATA[
+                AND DATE(start_time) <= #{startDateTo}
+                ]]>
+            </if>
+            <if test="endDateFrom != null">
+                <![CDATA[
+                AND DATE(end_time) >= #{endDateFrom}
+                ]]>
+            </if>
+            <if test="endDateTo != null">
+                <![CDATA[
+                AND DATE(end_time) <= #{endDateTo}
+                ]]>
+            </if>
+        </where>
+    </select>
+
 </mapper>

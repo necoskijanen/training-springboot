@@ -2,14 +2,54 @@
 
 ## Current Work Focus
 
+### Batch History Search Implementation - IN PROGRESS
+- Backend API for advanced batch history search with filtering and pagination
+- Support for role-based access control (admin can search all users, users can search own history)
+- Search conditions: job name, status, date ranges (start/end)
+- Pagination: 10 items per page with page navigation (previous/next/page number)
+- Status: 🔄 BACKEND COMPLETED, FRONTEND PENDING
+
+## Recent Changes
+
+### 2025/10/19 - Batch History Search Backend Implementation (午後中期)
+
+#### DTOs Created with Lombok
+- **BatchHistorySearchRequest** - Search conditions (jobName, status, date ranges, userId, page, pageSize)
+- **BatchHistoryResponse** - Single history item response with user name for admin
+- **BatchHistoryPageResponse** - Paginated response with page metadata
+
+#### MyBatis Mapper Enhancement
+- **searchBatchExecution()** - Dynamic SQL query with date range filtering (CDATA sections for comparison operators)
+- **countBatchExecution()** - Count query for total records matching search criteria
+- Uses `<where>` and `<if>` tags for optional filters
+- Results ordered by end_time DESC
+- LIMIT/OFFSET pagination implemented
+
+#### BatchExecutionRepository Interface
+- Added searchBatchExecution() method signature
+- Added countBatchExecution() method signature
+- Full parameter documentation with JavaDoc
+
+#### BatchRestController Enhancement
+- **GET /api/batch/history/search** - New advanced search endpoint
+- Query parameters: jobName, status, startDateFrom, startDateTo, endDateFrom, endDateTo, userId, page, size
+- Role-based filtering:
+  - General users: Can only search their own history (userId fixed)
+  - Admins: Can search by specific userId if provided
+- Response includes user names for admin view (null for regular users)
+- Page metadata: totalCount, totalPages, currentPage, hasNextPage, hasPrevPage
+- Proper HTTP status codes and error handling
+
+#### XML MapperXML Fixes
+- Used CDATA sections `<![CDATA[...]]>` to properly handle comparison operators (`>=`, `<=`)
+- Prevents XML parsing errors with comparison operators in WHERE clauses
+
 ### Batch Processing Implementation - COMPLETED
 - Batch processing infrastructure fully implemented with CompletableFuture and UUID-based execution tracking
 - REST API endpoints created (4 endpoints for job list, execution, status, and history)
 - Frontend JavaScript implementation complete with 5-second polling
 - Database integration with batch_execution_history table
 - Status: ✅ COMPLETED - Ready for testing and deployment
-
-## Recent Changes
 
 ### 2025/10/19 - Complete Batch Processing Implementation (午後後期)
 
@@ -133,7 +173,35 @@
 
 ## Next Steps
 
-### Next Phase: Logging System Implementation
+### Immediate: Batch History Search Frontend Implementation
+1. **Search Form Page Creation**
+   - URL: `/admin/batch/search` for admins, `/user/batch/search` for users
+   - Form fields:
+     - Job name: text input (optional)
+     - Status: dropdown (RUNNING, COMPLETED_SUCCESS, FAILED) or All
+     - Start date range: two `<input type="date">` fields
+     - End date range: two `<input type="date">` fields
+     - User selection: dropdown (admin only - fetch user list from API)
+     - Search button: calls `/api/batch/history/search`
+
+2. **Results Display**
+   - Table showing search results with columns: Job Name, Status, User (admin only), Start Time, End Time, Exit Code
+   - Status displayed with color-coded badges
+   - Click to view details (optional for now)
+
+3. **Pagination Controls**
+   - Page size: 10 items per page (fixed)
+   - Navigation: Previous button, page number display, Next button
+   - All controls update based on totalPages from API response
+
+4. **JavaScript Implementation**
+   - Vanilla JavaScript (no framework)
+   - Form validation before search
+   - API call to `/api/batch/history/search`
+   - DOM manipulation to display results
+   - Clear search button to reset form
+
+### Future: Logging System Implementation
 1. **Structured JSON Logging**
    - Configure Logback with JSON output format
    - Add logstash-logback-encoder dependency (if needed)

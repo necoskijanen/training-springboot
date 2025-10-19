@@ -1,5 +1,6 @@
 package com.example.demo.presentation;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.application.batch.BatchService;
+import com.example.demo.application.batch.dto.BatchHistoryPageResponse;
+import com.example.demo.application.batch.dto.BatchHistoryResponse;
 import com.example.demo.authentication.AuthenticationUtil;
 import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
+import com.example.demo.domain.user.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +52,9 @@ public class BatchRestController {
 
     @Autowired
     private BatchConfig batchConfig;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * 有効なジョブ一覧を取得する
@@ -169,6 +176,94 @@ public class BatchRestController {
                 .size(size)
                 .totalCount(totalCount)
                 .totalPages((totalCount + size - 1) / size)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * バッチ実行履歴を検索する（高度な検索条件対応）
+     * 
+     * @param jobName       バッチ名（部分一致）
+     * @param status        ステータス
+     * @param startDateFrom 開始日時（開始）
+     * @param startDateTo   開始日時（終了）
+     * @param endDateFrom   終了日時（開始）
+     * @param endDateTo     終了日時（終了）
+     * @param userId        実行ユーザーID（管理者用）
+     * @param page          ページ番号（0 から開始）
+     * @param size          ページサイズ（デフォルト10）
+     * @return 検索結果のページネーション
+     */
+    @GetMapping("/history/search")
+    public ResponseEntity<BatchHistoryPageResponse> searchBatchHistory(
+            @RequestParam(required = false) String jobName,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) LocalDate startDateFrom,
+            @RequestParam(required = false) LocalDate startDateTo,
+            @RequestParam(required = false) LocalDate endDateFrom,
+            @RequestParam(required = false) LocalDate endDateTo,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("Search batch history: jobName={}, status={}, page={}, size={}", jobName, status, page, size);
+
+        Long currentUserId = authenticationUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 一般ユーザーの場合、userIdは自分に固定
+        Long searchUserId = currentUserId;
+        if (authenticationUtil.hasAdminRole() && userId != null) {
+            searchUserId = userId;
+        }
+
+        // ページネーション用のオフセット・リミットを計算
+        int offset = page * size;
+        int limit = size;
+
+        // 検索を実行
+        List<BatchExecution> executions = batchExecutionRepository.searchBatchExecution(
+                searchUserId, jobName, status, startDateFrom, startDateTo, endDateFrom, endDateTo, offset, limit);
+
+        // 総件数を取得
+        long totalCount = batchExecutionRepository.countBatchExecution(
+                searchUserId, jobName, status, startDateFrom, startDateTo, endDateFrom, endDateTo);
+
+        // レスポンスを構築
+        List<BatchHistoryResponse> items = executions.stream()
+                .map(exec -> {
+                    // 一般ユーザーの場合、ユーザー名は不要（自分のデータのみ）
+                    // 管理者の場合、ユーザー名を取得
+                    String userName = null;
+                    if (authenticationUtil.hasAdminRole()) {
+                        userName = userRepository.findById(exec.getUserId())
+                                .map(user -> user.getName())
+                                .orElse("Unknown");
+                    }
+
+                    return BatchHistoryResponse.builder()
+                            .executionId(exec.getId())
+                            .jobName(exec.getJobName())
+                            .status(exec.getStatus())
+                            .exitCode(exec.getExitCode())
+                            .userId(exec.getUserId())
+                            .userName(userName)
+                            .startTime(exec.getStartTime())
+                            .endTime(exec.getEndTime())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        int totalPages = (int) ((totalCount + size - 1) / size);
+        BatchHistoryPageResponse response = BatchHistoryPageResponse.builder()
+                .content(items)
+                .totalCount(totalCount)
+                .totalPages(totalPages)
+                .currentPage(page)
+                .hasNextPage(page < totalPages - 1)
+                .hasPrevPage(page > 0)
                 .build();
 
         return ResponseEntity.ok(response);
