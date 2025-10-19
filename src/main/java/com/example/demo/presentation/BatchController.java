@@ -10,38 +10,37 @@ import org.springframework.web.servlet.ModelAndView;
  * バッチ処理画面のルーティングを担当するコントローラー
  */
 @Controller
-@RequestMapping("/batch")
 public class BatchController {
 
-    /**
-     * Admin - バッチ起動画面
-     */
-    @GetMapping("/admin/start")
-    public String adminBatchStart() {
-        return "batch/start";
-    }
+    /// **
+    // * Admin - バッチ起動画面
+    // */
+    // @GetMapping("/admin/batch/start")
+    // public String adminBatchStart() {
+    // return "batch/start";
+    // }
 
-    /**
-     * Admin - バッチ履歴画面
-     */
-    @GetMapping("/admin/history")
-    public ModelAndView adminBatchHistory() {
-        return new ModelAndView("batch/history");
-    }
+    /// **
+    // * Admin - バッチ履歴画面
+    // */
+    // @GetMapping("/admin/batch/history")
+    // public ModelAndView adminBatchHistory() {
+    // return new ModelAndView("batch/history");
+    // }
 
-    /**
-     * User - バッチ起動画面
-     */
-    @GetMapping("/user/start")
-    public ModelAndView userBatchStart() {
-        return new ModelAndView("batch/start");
-    }
+    /// **
+    // * User - バッチ起動画面
+    // */
+    // @GetMapping("/user/batch/start")
+    // public ModelAndView userBatchStart() {
+    // return new ModelAndView("batch/start");
+    // }
 
-    /**
-     * User - バッチ履歴画面
-     */
-    @GetMapping("/user/history")
-    public ModelAndView userBatchHistory() {
-        return new ModelAndView("batch/history");
-    }
+    /// **
+    // * User - バッチ履歴画面
+    // */
+    // @GetMapping("/user/batch/history")
+    // public ModelAndView userBatchHistory() {
+    // return new ModelAndView("batch/history");
+    // }
 }

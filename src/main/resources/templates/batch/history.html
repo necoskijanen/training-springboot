@@ -9,11 +9,12 @@
     <meta name="csrf-header" th:content="${_csrf.headerName}">
 </head>
 
-<body class="theme-admin">
+<body th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'theme-admin' : 'theme-user'">
     <div th:replace="~{fragments/header :: header('バッチ履歴')}"></div>
 
     <div class="content-wrapper">
-        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+        <div sec:authorize="hasRole('ADMIN')" th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+        <div sec:authorize="!hasRole('ADMIN')" th:replace="~{fragments/user-sidebar :: sidebar}"></div>
 
         <main role="main">
             <h1>バッチ履歴検索</h1>

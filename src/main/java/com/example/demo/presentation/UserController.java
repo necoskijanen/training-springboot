@@ -13,4 +13,15 @@ public class UserController {
         // src/main/resources/templates/user/home.html を返す
         return "user/home";
     }
+
+    @GetMapping("/batch/start")
+    public String userBatchStart() {
+        return "batch/start";
+    }
+
+    @GetMapping("/batch/history")
+    public String userBatchHistory() {
+        return "batch/history";
+    }
+
 }

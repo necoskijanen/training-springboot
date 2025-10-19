@@ -17,41 +17,42 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+        @Autowired
+        private UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+        @Autowired
+        private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Autowired
-    private CustomAuthenticationFailureHandler authenticationFailureHandler;
+        @Autowired
+        private CustomAuthenticationFailureHandler authenticationFailureHandler;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authz -> authz
-                        // Permit access to login page and resources needed to render it
-                        .requestMatchers("/login", "/css/login.css", "/favicon.ico").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                        .anyRequest()
-                        .authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .successHandler(authenticationSuccessHandler)
-                        .failureHandler(authenticationFailureHandler)
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll())
-                .userDetailsService(userDetailsService);
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .authorizeHttpRequests(authz -> authz
+                                                // Permit access to login page and resources needed to render it
+                                                .requestMatchers("/login", "/css/login.css", "/favicon.ico").permitAll()
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers("/api/batch/**").hasAnyRole("USER", "ADMIN")
+                                                .anyRequest()
+                                                .authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .successHandler(authenticationSuccessHandler)
+                                                .failureHandler(authenticationFailureHandler)
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutSuccessUrl("/login?logout")
+                                                .permitAll())
+                                .userDetailsService(userDetailsService);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
 }

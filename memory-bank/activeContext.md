@@ -291,9 +291,43 @@
 ### Technical Decisions Resolved
 - **Batch Configuration**: YAML-based (batch/config.yml) with flexible job definitions
 - **Test Environment**: Shell and batch scripts for testing (wait_time.sh/.bat)
-- **Async Processing**: Planned CompletableFuture approach
-- **Role-Based Access**: Both ADMIN and USER roles can access batch features
+- **Async Processing**: CompletableFuture approach implemented ✅
+- **Role-Based Access**: Both ADMIN and USER roles can access batch features ✅
+  - ADMIN: `/admin/batch/**` (admin-only batch features)
+  - USER: `/batch/user/**` (general user batch features)
+  - Both roles: `/api/batch/**` (batch REST API)
 - **Timeout Configuration**: 60 seconds per job (configured in config.yml)
+
+### 2025/10/19 - General User Batch Access - COMPLETED ✅
+
+**Modified Files:**
+- BatchController.java, SecurityConfig.java, batch/start.html, batch/history.html
+
+**Root Cause:** ユーザーがバッチ画面に遷移後、admin-sidebar固定のため管理者用リンク(/admin)が表示され権限エラーが発生
+
+**Changes Made:**
+
+1. **BatchController Route Restructuring**
+   - Removed `@RequestMapping("/batch")` class-level mapping  
+   - Updated routes: `/admin/batch/start`, `/admin/batch/history`, `/user/batch/start`, `/user/batch/history`
+
+2. **SecurityConfig Authorization Update**
+   - `/admin/batch/**` → `hasRole("ADMIN")`
+   - `/user/batch/**` → `hasAnyRole("USER", "ADMIN")`
+   - `/api/batch/**` → `hasAnyRole("USER", "ADMIN")`
+
+3. **Template Sidebar Conditional Rendering** ← KEY FIX
+   - batch/start.html: Added `sec:authorize` to conditionally display sidebars
+     - `hasRole('ADMIN')` → admin-sidebar
+     - `hasRole('USER') and !hasRole('ADMIN')` → user-sidebar
+   - batch/history.html: Same conditional sidebar rendering
+
+**Result:**
+- ✅ General users can access `/user/batch/start` and `/user/batch/history`
+- ✅ Correct sidebar displayed based on user role
+- ✅ All navigation links point to correct role-specific paths
+- ✅ No more permission errors from sidebar links
+- ✅ Color theme automatically switches based on user role (theme-admin / theme-user)
 
 ### Batch Start Screen Specification (確定: 2025/10/19)
 
