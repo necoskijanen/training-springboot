@@ -47,6 +47,9 @@ public class BatchExecuteService {
     @Autowired
     private BatchConfig batchConfig;
 
+    @Autowired
+    private BatchMapper batchMapper;
+
     // 実行中のバッチを追跡するマップ
     private final ConcurrentHashMap<String, CompletableFuture<BatchExecution>> executionMap = new ConcurrentHashMap<>();
 
@@ -136,7 +139,7 @@ public class BatchExecuteService {
      */
     public Optional<StatusResponse> getExecutionStatus(String executionId) {
         return getExecutionEntity(executionId)
-                .map(BatchMapper::toStatusResponse);
+                .map(exec -> batchMapper.toStatusResponse(exec));
     }
 
     /**
