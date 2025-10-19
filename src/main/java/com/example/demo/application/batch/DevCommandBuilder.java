@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  * OSに応じて自動的に拡張子（.sh / .bat）を付与する
  */
 @Component
-@Profile("dev")
+@Profile({ "dev", "test" })
 @Slf4j
 public class DevCommandBuilder implements CommandBuilder {
 

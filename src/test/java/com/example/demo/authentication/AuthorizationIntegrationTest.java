@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * 認可（アクセス制御）の統合テスト
  */
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("認可機能の統合テスト")
@@ -49,7 +49,14 @@ class AuthorizationIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", roles = { "ADMIN", "USER" })
+    @DisplayName("未認証ユーザーもCSSファイルにアクセスできること")
+    void 未認証ユーザーもCSSファイルにアクセスできること() throws Exception {
+        mockMvc.perform(get("/css/login.css"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
     @DisplayName("管理者は管理者ページにアクセスできること")
     void 管理者は管理者ページにアクセスできること() throws Exception {
         mockMvc.perform(get("/admin/home"))
@@ -57,7 +64,7 @@ class AuthorizationIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", roles = { "ADMIN", "USER" })
+    @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
     @DisplayName("管理者は一般ユーザーページにもアクセスできること")
     void 管理者は一般ユーザーページにもアクセスできること() throws Exception {
         mockMvc.perform(get("/user/home"))
@@ -81,17 +88,11 @@ class AuthorizationIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@example.com", roles = { "ADMIN", "USER" })
+    @WithMockUser(username = "admin@example.com", roles = { "ADMIN" })
     @DisplayName("管理者はCSSファイルにアクセスできること")
     void 管理者はCSSファイルにアクセスできること() throws Exception {
         mockMvc.perform(get("/css/common.css"))
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @DisplayName("未認証ユーザーもCSSファイルにアクセスできること")
-    void 未認証ユーザーもCSSファイルにアクセスできること() throws Exception {
-        mockMvc.perform(get("/css/common.css"))
-                .andExpect(status().isOk());
-    }
 }

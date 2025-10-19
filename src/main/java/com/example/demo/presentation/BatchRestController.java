@@ -115,7 +115,7 @@ public class BatchRestController {
     public ResponseEntity<StatusResponse> getStatus(@PathVariable String executionId) {
         log.debug("Get status for execution: {}", executionId);
 
-        return batchService.getExecutionStatus(executionId)
+        var result = batchService.getExecutionStatus(executionId)
                 .map(exec -> ResponseEntity.ok(StatusResponse.builder()
                         .status(exec.getStatus())
                         .exitCode(exec.getExitCode())
@@ -124,6 +124,7 @@ public class BatchRestController {
                         .jobName(exec.getJobName())
                         .build()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+        return result;
     }
 
     /**
@@ -139,7 +140,7 @@ public class BatchRestController {
             @RequestParam(defaultValue = "10") int size) {
         log.info("Get batch history: page={}, size={}", page, size);
 
-        return authenticationUtil.getCurrentUserIdOptional()
+        var result = authenticationUtil.getCurrentUserIdOptional()
                 .map(userId -> {
                     // ページネーション用のオフセット・リミットを計算
                     int offset = page * size;
@@ -176,6 +177,7 @@ public class BatchRestController {
                     return ResponseEntity.ok(response);
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        return result;
     }
 
     /**

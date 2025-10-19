@@ -3,7 +3,7 @@ spring:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
+    password: ''
   sql:
     init:
       mode: always
@@ -12,6 +12,9 @@ spring:
   h2:
     console:
       enabled: false
+
+  config:
+    import: classpath:batch/config.yml
 
 mybatis:
   type-aliases-package: com.example.demo.domain.user

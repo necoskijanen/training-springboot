@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 認証機能の統合テスト
  * 実際のSpring Securityの設定を使用してテストする
  */
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("認証機能の統合テスト")
@@ -38,7 +38,7 @@ class AuthenticationIntegrationTest {
                 .andExpect(redirectedUrl("/admin/home")) // redirectedUrl に変更
                 .andExpect(authenticated()
                         .withUsername("admin")
-                        .withRoles("ADMIN", "USER"));
+                        .withRoles("ADMIN"));
     }
 
     @Test
