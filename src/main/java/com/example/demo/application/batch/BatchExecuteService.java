@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.application.batch.dto.ExecuteRequest;
+import com.example.demo.application.batch.dto.ExecuteResponse;
 import com.example.demo.application.batch.dto.JobResponse;
 import com.example.demo.application.batch.dto.StatusResponse;
 import com.example.demo.application.batch.mapper.BatchMapper;
@@ -24,7 +26,7 @@ import com.example.demo.domain.batch.BatchExecution;
 import com.example.demo.domain.batch.ExecutionStatus;
 import com.example.demo.domain.batch.exception.BatchDomainException;
 import com.example.demo.domain.batch.exception.BatchErrorCode;
-import com.example.demo.domain.batch.repository.BatchExecutionRepository;
+import com.example.demo.domain.batch.repository.BatchRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchExecuteService {
 
     @Autowired
-    private BatchExecutionRepository batchExecutionRepository;
+    private BatchRepository batchExecutionRepository;
 
     @Autowired
     private CommandBuilder commandBuilder;
@@ -57,16 +59,15 @@ public class BatchExecuteService {
      * @return 実行ID
      * @throws BatchDomainException ジョブが見つからない場合
      */
-    public String startBatch(String jobId, Long userId) {
-        log.info("Starting batch execution for job: {}, userId: {}", jobId, userId);
+    public ExecuteResponse startBatch(ExecuteRequest request, Long userId) {
+        log.info("Starting batch execution for job: {}, userId: {}", request, userId);
 
         // ジョブ設定を取得
-        BatchConfig.Job job = getJobByIdOptional(jobId)
+        BatchConfig.Job job = getJobByIdOptional(request.getJobId())
                 .orElseThrow(() -> new BatchDomainException(
                         BatchErrorCode.JOB_NOT_FOUND));
 
-        // ドメインのファクトリメソッドを使用して実行を開始
-        BatchExecution execution = BatchExecution.startNew(jobId, job.getName(), userId);
+        BatchExecution execution = BatchExecution.startNew(job.getId(), job.getName(), userId);
         String executionId = execution.getId();
 
         // データベースに実行レコードを作成
@@ -93,7 +94,7 @@ public class BatchExecuteService {
         });
 
         log.info("Batch execution started asynchronously: {}", executionId);
-        return executionId;
+        return new ExecuteResponse(executionId);
     }
 
     /**

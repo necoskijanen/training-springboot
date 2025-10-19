@@ -70,7 +70,7 @@ public class BatchMapper {
             return null;
         }
         return BatchHistoryResponse.builder()
-                .executionId(execution.getId())
+                .id(execution.getId())
                 .jobName(execution.getJobName())
                 .status(execution.getStatus())
                 .exitCode(execution.getExitCode())

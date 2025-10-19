@@ -1,7 +1,6 @@
 package com.example.demo.presentation;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,14 +21,10 @@ import com.example.demo.application.batch.dto.BatchHistoryPageResponse;
 import com.example.demo.application.batch.dto.BatchHistorySearchRequest;
 import com.example.demo.application.batch.dto.ExecuteRequest;
 import com.example.demo.application.batch.dto.ExecuteResponse;
-import com.example.demo.application.batch.dto.HistoryItem;
 import com.example.demo.application.batch.dto.HistoryResponse;
 import com.example.demo.application.batch.dto.JobResponse;
 import com.example.demo.application.batch.dto.StatusResponse;
 import com.example.demo.authentication.AuthenticationUtil;
-import com.example.demo.domain.batch.BatchExecution;
-import com.example.demo.domain.batch.repository.BatchExecutionRepository;
-import com.example.demo.util.PaginationHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,10 +41,7 @@ public class BatchRestController {
     private BatchExecuteService batchService;
 
     @Autowired
-    private BatchHistoryService batchHistoryApplicationService;
-
-    @Autowired
-    private BatchExecutionRepository batchExecutionRepository;
+    private BatchHistoryService batchHistoryService;
 
     @Autowired
     private AuthenticationUtil authenticationUtil;
@@ -78,12 +70,12 @@ public class BatchRestController {
         try {
             // メインスレッドで事前にユーザーIDを取得
             Long userId = authenticationUtil.getCurrentUserId();
-            String executionId = batchService.startBatch(request.getJobId(), userId);
-            return ResponseEntity.ok(new ExecuteResponse(executionId));
+            ExecuteResponse response = batchService.startBatch(request, userId);
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            log.warn("Job not found: {}", request.getJobId());
+            log.warn("Job not found: {}", request);
             return ResponseEntity.badRequest()
-                    .body(new ExecuteResponse(null, "Job not found: " + request.getJobId()));
+                    .body(new ExecuteResponse(null, "Job not found: " + request));
         } catch (Exception e) {
             log.error("Failed to start batch execution", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -119,44 +111,9 @@ public class BatchRestController {
             @RequestParam(defaultValue = "10") int size) {
         log.info("Get batch history: page={}, size={}", page, size);
 
-        var result = authenticationUtil.getCurrentUserIdOptional()
-                .map(userId -> {
-                    // ページネーション用のオフセット・リミットを計算
-                    int offset = PaginationHelper.calculateOffset(page, size);
-
-                    // 履歴を取得
-                    List<BatchExecution> executions = batchExecutionRepository.findByUserIdWithPaging(userId, offset,
-                            size);
-
-                    // 総件数を取得
-                    long totalCount = batchExecutionRepository.countByUserId(userId);
-
-                    // レスポンスを構築
-                    List<HistoryItem> items = executions.stream()
-                            .map(exec -> HistoryItem.builder()
-                                    .id(exec.getId())
-                                    .jobId(exec.getJobId())
-                                    .jobName(exec.getJobName())
-                                    .status(exec.getStatus())
-                                    .startTime(exec.getStartTime())
-                                    .endTime(exec.getEndTime())
-                                    .exitCode(exec.getExitCode())
-                                    .build())
-                            .collect(Collectors.toList());
-
-                    int totalPages = PaginationHelper.calculateTotalPages(totalCount, size);
-                    HistoryResponse response = HistoryResponse.builder()
-                            .items(items)
-                            .page(page)
-                            .size(size)
-                            .totalCount(totalCount)
-                            .totalPages(totalPages)
-                            .build();
-
-                    return ResponseEntity.ok(response);
-                })
+        return authenticationUtil.getCurrentUserIdOptional()
+                .map(userId -> ResponseEntity.ok(batchHistoryService.getHistory(userId, page, size)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
-        return result;
     }
 
     /**
@@ -171,7 +128,8 @@ public class BatchRestController {
         log.info("Search batch history: {}", request);
 
         // Application Service にビジネスロジックを委譲
-        BatchHistoryPageResponse response = batchHistoryApplicationService.searchBatchHistory(request);
+        Long userId = authenticationUtil.getCurrentUserId();
+        BatchHistoryPageResponse response = batchHistoryService.searchBatchHistory(request, userId);
 
         return ResponseEntity.ok(response);
     }

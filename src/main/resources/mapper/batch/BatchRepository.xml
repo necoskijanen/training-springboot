@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.demo.domain.batch.repository.BatchExecutionRepository">
+<mapper namespace="com.example.demo.domain.batch.repository.BatchRepository">
 
     <!-- BatchExecution resultMap with ExecutionStatus enum type handler -->
     <resultMap id="batchExecutionResultMap" type="com.example.demo.domain.batch.BatchExecution">

@@ -20,7 +20,7 @@ function initializeSearch() {
 }
 
 function checkAdminStatus() {
-    const userId = document.getElementById('userId');
+    const userName = document.getElementById('userName');
     const userSearchGroup = document.getElementById('userSearchGroup');
     const userHeaderCell = document.getElementById('userHeaderCell');
 
@@ -28,15 +28,15 @@ function checkAdminStatus() {
     const path = window.location.pathname;
     const isAdmin = path.includes('/admin/');
 
-    if (isAdmin && userId && userSearchGroup) {
-        // Show and enable userId field for admin users
-        userId.disabled = false;
+    if (isAdmin && userName && userSearchGroup) {
+        // Show and enable userName field for admin users
+        userName.disabled = false;
         userSearchGroup.style.display = 'block';
         userHeaderCell.style.display = 'table-cell';
-    } else if (userId && userSearchGroup) {
-        // Hide and disable userId field for non-admin users
-        userId.disabled = true;
-        userId.value = '';
+    } else if (userName && userSearchGroup) {
+        // Hide and disable userName field for non-admin users
+        userName.disabled = true;
+        userName.value = '';
         userSearchGroup.style.display = 'none';
     }
 }
@@ -59,7 +59,7 @@ function performSearch() {
     const status = document.getElementById('status').value;
     const startDateFrom = document.getElementById('startDateFrom').value;
     const endDateTo = document.getElementById('endDateTo').value;
-    const userNameOrId = document.getElementById('userId').value.trim();
+    const userName = document.getElementById('userName').value.trim();
 
     showLoading(true);
     hideError();
@@ -79,8 +79,8 @@ function performSearch() {
     if (endDateTo) {
         params.append('endDateTo', endDateTo);
     }
-    if (userNameOrId) {
-        params.append('userName', userNameOrId);
+    if (userName) {
+        params.append('userName', userName);
     }
 
     params.append('page', 0);
@@ -144,7 +144,7 @@ function displayResults(data) {
         }
 
         const executionIdCell = document.createElement('td');
-        executionIdCell.textContent = item.executionId ? item.executionId.substring(0, 8) + '...' : '';
+        executionIdCell.textContent = item.id ? item.id.substring(0, 8) + '...' : '';
         row.appendChild(executionIdCell);
 
         const jobNameCell = document.createElement('td');
@@ -189,7 +189,7 @@ function goToPage(pageNumber) {
     const status = document.getElementById('status').value;
     const startDateFrom = document.getElementById('startDateFrom').value;
     const endDateTo = document.getElementById('endDateTo').value;
-    const userNameOrId = document.getElementById('userId').value.trim();
+    const userName = document.getElementById('userName').value.trim();
 
     showLoading(true);
     hideError();
@@ -209,8 +209,8 @@ function goToPage(pageNumber) {
     if (endDateTo) {
         params.append('endDateTo', endDateTo);
     }
-    if (userNameOrId) {
-        params.append('userName', userNameOrId);
+    if (userName) {
+        params.append('userName', userName);
     }
 
     params.append('page', pageNumber - 1);
@@ -289,7 +289,7 @@ function clearForm() {
     document.getElementById('status').value = '';
     document.getElementById('startDateFrom').value = '';
     document.getElementById('endDateTo').value = '';
-    document.getElementById('userId').value = '';
+    document.getElementById('userName').value = '';
 
     hideError();
 

@@ -14,11 +14,14 @@ import com.example.demo.application.batch.dto.BatchHistoryPageResponse;
 import com.example.demo.application.batch.dto.BatchHistoryResponse;
 import com.example.demo.application.batch.dto.BatchHistorySearchRequest;
 import com.example.demo.application.batch.dto.BatchSearchParams;
+import com.example.demo.application.batch.dto.HistoryItem;
+import com.example.demo.application.batch.dto.HistoryResponse;
 import com.example.demo.application.batch.mapper.BatchMapper;
-import com.example.demo.authentication.AuthenticationUtil;
 import com.example.demo.domain.batch.BatchExecution;
-import com.example.demo.domain.batch.repository.BatchExecutionRepository;
+import com.example.demo.domain.batch.repository.BatchRepository;
 import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.exception.UserDomainException;
+import com.example.demo.domain.user.exception.UserErrorCode;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.util.PaginationHelper;
 import com.example.demo.util.StringUtil;
@@ -35,13 +38,51 @@ import lombok.extern.slf4j.Slf4j;
 public class BatchHistoryService {
 
     @Autowired
-    private BatchExecutionRepository batchExecutionRepository;
+    private BatchRepository batchRepository;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationUtil authenticationUtil;
+    /**
+     * ユーザーのバッチ実行履歴を取得する（ページネーション対応）
+     * 
+     * @param userId   ユーザーID
+     * @param page     ページ番号（0から開始）
+     * @param pageSize ページサイズ
+     * @return 履歴レスポンス
+     */
+    public HistoryResponse getHistory(Long userId, int page, int pageSize) {
+        log.info("Get batch history for user: {}, page: {}, pageSize: {}", userId, page, pageSize);
+
+        // 履歴を取得
+        BatchSearchParams params = BatchSearchParams.of(userId, page, pageSize);
+        List<BatchExecution> executions = batchRepository.searchBatchExecution(params);
+
+        // 総件数を取得
+        long totalCount = batchRepository.countByUserId(userId);
+
+        // レスポンスを構築
+        List<HistoryItem> items = executions.stream()
+                .map(exec -> HistoryItem.builder()
+                        .id(exec.getId())
+                        .jobId(exec.getJobId())
+                        .jobName(exec.getJobName())
+                        .status(exec.getStatus())
+                        .startTime(exec.getStartTime())
+                        .endTime(exec.getEndTime())
+                        .exitCode(exec.getExitCode())
+                        .build())
+                .collect(Collectors.toList());
+
+        int totalPages = PaginationHelper.calculateTotalPages(totalCount, pageSize);
+        return HistoryResponse.builder()
+                .items(items)
+                .page(page)
+                .size(pageSize)
+                .totalCount(totalCount)
+                .totalPages(totalPages)
+                .build();
+    }
 
     /**
      * バッチ実行履歴を検索する
@@ -49,32 +90,29 @@ public class BatchHistoryService {
      * @param request 検索条件DTO
      * @return バッチ履歴ページレスポンス
      */
-    public BatchHistoryPageResponse searchBatchHistory(BatchHistorySearchRequest request) {
+    public BatchHistoryPageResponse searchBatchHistory(BatchHistorySearchRequest request, Long userId) {
         log.info("Search batch history: {}", request);
 
-        // 現在のユーザーIDを取得
-        Long currentUserId = authenticationUtil.getCurrentUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDomainException(UserErrorCode.USER_NOT_FOUND));
 
         // 検索ユーザーIDを決定（アクセス制御）
-        Long searchUserId = determineSearchUserId(currentUserId, request.getUserName());
-
-        // ページネーション用のオフセットを計算
-        int offset = PaginationHelper.calculateOffset(request.getPage(), request.getPageSize());
+        Long searchUserId = determineSearchUserId(user, request.getUserName());
 
         // 検索パラメータオブジェクトを作成
-        BatchSearchParams searchParams = BatchSearchParams.of(request, searchUserId, offset);
+        BatchSearchParams searchParams = BatchSearchParams.of(request, searchUserId);
 
         // バッチ実行履歴を検索
-        List<BatchExecution> executions = batchExecutionRepository.searchBatchExecution(searchParams);
+        List<BatchExecution> executions = batchRepository.searchBatchExecution(searchParams);
 
         // 総件数を取得
-        long totalCount = batchExecutionRepository.countBatchExecution(searchParams);
+        long totalCount = batchRepository.countBatchExecution(searchParams);
 
         // ユーザーIDをすべて抽出
         Set<Long> userIds = executions.stream().map(BatchExecution::getUserId).collect(Collectors.toSet());
 
         // 一度にすべてのユーザーを取得（バッチ取得でN+1問題を解決）
-        final Map<Long, String> userNameMap = (!userIds.isEmpty() && authenticationUtil.hasAdminRole())
+        final Map<Long, String> userNameMap = (!userIds.isEmpty() && user.hasAdminRole())
                 ? userRepository.findByIds(userIds).stream()
                         .collect(Collectors.toMap(User::getId, User::getName,
                                 (existing, replacement) -> existing))
@@ -83,10 +121,10 @@ public class BatchHistoryService {
         // Entity を DTO に変換
         List<BatchHistoryResponse> items = executions.stream()
                 .map(exec -> {
-                    String displayUserName = authenticationUtil.hasAdminRole()
+                    String userName = user.hasAdminRole()
                             ? userNameMap.getOrDefault(exec.getUserId(), "Unknown")
                             : null;
-                    return BatchMapper.toHistoryResponse(exec, displayUserName, exec.getUserId());
+                    return BatchMapper.toHistoryResponse(exec, userName, exec.getUserId());
                 })
                 .collect(Collectors.toList());
 
@@ -108,20 +146,20 @@ public class BatchHistoryService {
      * 検索対象ユーザーIDを決定する
      * ユーザーのロールに基づいてアクセス制御を行う
      * 
-     * @param currentUserId 現在のユーザーID
-     * @param userName      検索対象ユーザー名（optional）
+     * @param user     検索実行ユーザー
+     * @param userName 検索対象ユーザー名（optional）
      * @return 検索対象ユーザーID（管理者が全員検索の場合は null）
      */
-    private Long determineSearchUserId(Long currentUserId, String userName) {
+    private Long determineSearchUserId(User user, String userName) {
         // 一般ユーザーの場合、自分のデータのみ
-        if (!authenticationUtil.hasAdminRole()) {
-            return currentUserId;
+        if (!user.hasAdminRole()) {
+            return user.getId();
         }
 
         // 管理者の場合、ユーザー名が指定されていなければ全員検索
         if (StringUtil.isTrimmedNotEmpty(userName)) {
             return userRepository.findByName(userName)
-                    .map(user -> user.getId())
+                    .map(u -> u.getId())
                     .orElse(null);
         }
 

@@ -2,6 +2,8 @@ package com.example.demo.application.batch.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.util.PaginationHelper;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,7 +34,8 @@ public class BatchSearchParams {
      * @param userId  検索対象ユーザーID（アクセス制御後）
      * @return 検索パラメータオブジェクト
      */
-    public static BatchSearchParams of(BatchHistorySearchRequest request, Long userId, int offset) {
+    public static BatchSearchParams of(BatchHistorySearchRequest request, Long userId) {
+        int offset = PaginationHelper.calculateOffset(request.getPage(), request.getPageSize());
         return BatchSearchParams.builder()
                 .userId(userId)
                 .jobName(request.getJobName())
@@ -43,4 +46,14 @@ public class BatchSearchParams {
                 .pageSize(request.getPageSize())
                 .build();
     }
+
+    public static BatchSearchParams of(Long userId, int page, int pageSize) {
+        int offset = PaginationHelper.calculateOffset(page, pageSize);
+        return BatchSearchParams.builder()
+                .userId(userId)
+                .offset(offset)
+                .pageSize(pageSize)
+                .build();
+    }
+
 }

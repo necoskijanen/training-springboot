@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class BatchHistoryResponse {
-    private String executionId; // 実行ID（UUID）
+    private String id; // 実行ID（UUID）
     private String jobName; // ジョブ名
     private ExecutionStatus status; // ステータス
     private Integer exitCode; // 終了コード

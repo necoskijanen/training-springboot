@@ -13,7 +13,7 @@ import java.util.Optional;
  * バッチ実行履歴のリポジトリインターフェース
  */
 @Mapper
-public interface BatchExecutionRepository {
+public interface BatchRepository {
 
         /**
          * バッチ実行レコードを挿入する
@@ -57,7 +57,7 @@ public interface BatchExecutionRepository {
         long countByUserId(Long userId);
 
         /**
-         * 検索条件でバッチ実行レコードを検索する（パラメータオブジェクト版）
+         * 検索条件でバッチ実行レコードを検索する
          * 
          * @param params 検索パラメータオブジェクト
          * @return バッチ実行レコードのリスト
@@ -65,7 +65,7 @@ public interface BatchExecutionRepository {
         List<BatchExecution> searchBatchExecution(BatchSearchParams params);
 
         /**
-         * 検索条件でバッチ実行レコードの総件数を取得する（パラメータオブジェクト版）
+         * 検索条件でバッチ実行レコードの総件数を取得する
          * 
          * @param params 検索パラメータオブジェクト
          * @return 総件数

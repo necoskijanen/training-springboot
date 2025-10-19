@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * バッチ実行履歴のドメインエンティティ
- * 状態遷移管理と検証ロジックを担当する Rich Domain Model
+ * 状態遷移管理と検証ロジックを担当する
  */
 @Data
 @NoArgsConstructor
