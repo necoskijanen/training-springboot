@@ -14,16 +14,17 @@
         <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
 
         <main role="main">
+            <h1>ユーザ管理</h1>
+
             <div class="action-buttons">
-                <a href="#" th:href="@{/admin/users/new}" class="btn btn-primary">新規作成</a>
+                <a href="#" th:href="@{/admin/users/new}" class="btn-primary">新規作成</a>
             </div>
 
             <div th:if="${successMessage}" class="alert alert-success" role="alert">
                 <p th:text="${successMessage}"></p>
             </div>
 
-            <div class="search-section">
-                <h2>ユーザ検索</h2>
+            <div class="search-container">
                 <form th:action="@{/admin/users}" method="get" class="search-form">
                     <div class="form-group">
                         <label for="name">ユーザ名</label>
@@ -33,16 +34,15 @@
                         <label for="email">メールアドレス</label>
                         <input type="email" id="email" name="email" th:value="${email}" placeholder="メールアドレスを入力">
                     </div>
-                    <button type="submit" class="btn btn-primary">検索</button>
+
+                    <div class="search-buttons">
+                        <button type="submit" class="btn-search">検索</button>
+                    </div>
                 </form>
             </div>
 
-            <div class="result-section">
-                <h2>検索結果</h2>
-                <div th:if="${#lists.isEmpty(users)}" class="no-result">
-                    <p>ユーザが見つかりません。</p>
-                </div>
-                <table th:unless="${#lists.isEmpty(users)}" class="user-table">
+            <div class="results-container" th:unless="${#lists.isEmpty(users)}">
+                <table class="results-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -61,12 +61,15 @@
                             <td th:text="${user.admin ? '○' : ''}"></td>
                             <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                             <td>
-                                <a href="#" th:href="@{/admin/users/{id}/edit(id=${user.id})}"
-                                    class="btn btn-secondary">編集</a>
+                                <a href="#" th:href="@{/admin/users/{id}/edit(id=${user.id})}" class="btn-edit">編集</a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="no-results" th:if="${#lists.isEmpty(users)}">
+                ユーザが見つかりません。
             </div>
         </main>
     </div>
