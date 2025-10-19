@@ -5,15 +5,19 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.authentication.AuthenticationUtil;
 import com.example.demo.config.BatchConfig;
-import com.example.demo.domain.batch.repository.BatchExecutionRepository;
 import com.example.demo.domain.batch.BatchExecution;
+import com.example.demo.domain.batch.ExecutionStatus;
+import com.example.demo.domain.batch.repository.BatchExecutionRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,22 +35,111 @@ public class BatchService {
     @Autowired
     private CommandBuilder commandBuilder;
 
+    @Autowired
+    private AuthenticationUtil authenticationUtil;
+
+    @Autowired
+    private BatchConfig batchConfig;
+
+    // 実行中のバッチを追跡するマップ
+    private final ConcurrentHashMap<String, CompletableFuture<BatchExecution>> executionMap = new ConcurrentHashMap<>();
+
     /**
-     * バッチを非同期で実行する
+     * バッチを開始する（ジョブID指定）
+     * 
+     * @param jobId ジョブID
+     * @return 実行ID
+     */
+    public String startBatch(String jobId) {
+        log.info("Starting batch execution for job: {}", jobId);
+
+        // ジョブ設定を取得
+        BatchConfig.Job job = getJobById(jobId);
+        if (job == null) {
+            throw new IllegalArgumentException("Job not found: " + jobId);
+        }
+
+        // 実行IDを生成
+        String executionId = UUID.randomUUID().toString();
+
+        // ユーザーIDを取得
+        Long userId = authenticationUtil.getCurrentUserId();
+
+        // データベースに実行レコードを作成（status=RUNNING）
+        BatchExecution execution = BatchExecution.builder()
+                .id(executionId)
+                .jobId(jobId)
+                .jobName(job.getName())
+                .status(ExecutionStatus.RUNNING.name())
+                .userId(userId)
+                .startTime(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        batchExecutionRepository.insert(execution);
+        log.info("Created execution record: {}", executionId);
+
+        // 非同期実行を開始
+        CompletableFuture<BatchExecution> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                return executeBatch(executionId, job);
+            } catch (Exception e) {
+                log.error("Batch execution failed: {}", executionId, e);
+                return handleExecutionError(executionId, e);
+            }
+        });
+
+        // メモリマップに保存（高速ステータス確認用）
+        executionMap.put(executionId, future);
+
+        // 完了時にメモリマップから削除
+        future.thenRun(() -> {
+            executionMap.remove(executionId);
+            log.info("Removed execution from memory map: {}", executionId);
+        });
+
+        log.info("Batch execution started asynchronously: {}", executionId);
+        return executionId;
+    }
+
+    /**
+     * ジョブIDでジョブ設定を取得する
+     * 
+     * @param jobId ジョブID
+     * @return ジョブ設定
+     */
+    private BatchConfig.Job getJobById(String jobId) {
+        if (batchConfig.getJobs() == null) {
+            return null;
+        }
+        return batchConfig.getJobs().stream()
+                .filter(job -> job.getId().equals(jobId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * 実行ステータスを取得する
      * 
      * @param executionId 実行ID
-     * @param job         ジョブ定義
+     * @return 実行レコード
      */
-    @Async
-    public void executeBatchAsync(String executionId, BatchConfig.Job job) {
-        log.info("Start async batch execution: {} for job: {}", executionId, job.getId());
-
-        try {
-            executeBatch(executionId, job);
-        } catch (Exception e) {
-            log.error("Batch execution failed: {}", executionId, e);
-            updateExecutionStatus(executionId, "FAILED", 1);
+    public BatchExecution getExecutionStatus(String executionId) {
+        // メモリマップで実行中のプロセスを確認
+        CompletableFuture<BatchExecution> future = executionMap.get(executionId);
+        if (future != null && !future.isDone()) {
+            // 実行中
+            BatchExecution execution = batchExecutionRepository.findById(executionId);
+            if (execution == null) {
+                execution = new BatchExecution();
+                execution.setId(executionId);
+                execution.setStatus(ExecutionStatus.RUNNING.name());
+            }
+            return execution;
         }
+
+        // メモリにない場合（または完了した場合）はDBから取得
+        return batchExecutionRepository.findById(executionId);
     }
 
     /**
@@ -54,9 +147,10 @@ public class BatchService {
      * 
      * @param executionId 実行ID
      * @param job         ジョブ定義
+     * @return 実行レコード
      * @throws Exception 実行エラー
      */
-    private void executeBatch(String executionId, BatchConfig.Job job) throws Exception {
+    private BatchExecution executeBatch(String executionId, BatchConfig.Job job) throws Exception {
         log.info("Execute batch: {} with command: {}", executionId, job.getCommand());
 
         // ProcessBuilder を作成
@@ -86,8 +180,8 @@ public class BatchService {
         if (!finished) {
             log.warn("Batch execution timeout: {}", executionId);
             process.destroyForcibly();
-            updateExecutionStatus(executionId, "FAILED", 124); // Timeout exit code
-            return;
+            updateExecutionStatus(executionId, ExecutionStatus.FAILED.name(), 124); // Timeout exit code
+            return batchExecutionRepository.findById(executionId);
         }
 
         int exitCode = process.exitValue();
@@ -96,11 +190,28 @@ public class BatchService {
                 endTime - startTime);
 
         // ステータスを更新
+        String status;
         if (exitCode == 0) {
-            updateExecutionStatus(executionId, "COMPLETED_SUCCESS", null);
+            status = ExecutionStatus.COMPLETED_SUCCESS.name();
         } else {
-            updateExecutionStatus(executionId, "FAILED", exitCode);
+            status = ExecutionStatus.FAILED.name();
         }
+        updateExecutionStatus(executionId, status, exitCode);
+
+        // 更新された実行レコードを返す
+        return batchExecutionRepository.findById(executionId);
+    }
+
+    /**
+     * 実行エラーを処理する
+     * 
+     * @param executionId 実行ID
+     * @param e           例外
+     * @return 実行レコード
+     */
+    private BatchExecution handleExecutionError(String executionId, Exception e) {
+        updateExecutionStatus(executionId, ExecutionStatus.FAILED.name(), 1);
+        return batchExecutionRepository.findById(executionId);
     }
 
     /**

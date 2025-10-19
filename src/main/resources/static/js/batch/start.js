@@ -142,9 +142,14 @@ function executeBatch() {
     executeBtn.innerHTML = '<span class="loading"></span> 実行中...';
     let headers = getHeaders();
 
-    fetch('/api/batch/execute?jobId=' + selectedJob.id, {
+    const requestBody = {
+        jobId: selectedJob.id
+    };
+
+    fetch('/api/batch/execute', {
         method: 'POST',
-        headers
+        headers: headers,
+        body: JSON.stringify(requestBody)
     })
         .then(response => response.json())
         .then(data => {
@@ -153,7 +158,7 @@ function executeBatch() {
                 showAlert('バッチを実行しました: ' + data.executionId, 'success');
                 startPolling();
             } else {
-                showAlert('バッチの実行に失敗しました', 'error');
+                showAlert('バッチの実行に失敗しました: ' + (data.error || '不明なエラー'), 'error');
                 executeBtn.disabled = false;
                 executeBtn.innerHTML = '実行';
             }
@@ -231,8 +236,8 @@ function loadHistory(page) {
         .then(response => response.json())
         .then(data => {
             totalPages = data.totalPages;
-            displayHistory(data.content);
-            updatePagination(data.currentPage, data.totalPages);
+            displayHistory(data.items);
+            updatePagination(data.page, data.totalPages);
         })
         .catch(error => {
             showAlert('履歴の読み込みに失敗しました', 'error');

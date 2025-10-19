@@ -12,7 +12,7 @@ batch:
       environment:
         JAVA_HOME: /usr/lib/jvm/java-11-openjdk
       timeout: 10
-      workingDirectory: src/main/resources/batch
+      workingDirectory: ./
 
     - id: wait_time_error
       name: 待機テスト（エラー）
@@ -26,4 +26,4 @@ batch:
       environment:
         JAVA_HOME: /usr/lib/jvm/java-11-openjdk
       timeout: 5
-      workingDirectory: src/main/resources/batch
+      workingDirectory: ./
