@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +21,12 @@ public class BatchConfig {
     public static class Job {
         private String id;
         private String name;
-        private String description;
-        private boolean enabled;
+        private String description = "";
+        private boolean enabled = false;
         private String command;
-        private List<String> arguments;
-        private Map<String, String> environment;
-        private int timeout;
-        private String workingDirectory;
+        private List<String> arguments = new ArrayList<>();
+        private Map<String, String> environment = new HashMap<>();
+        private int timeout = 60;
+        private String workingDirectory = "./";
     }
 }

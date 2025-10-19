@@ -24,6 +24,7 @@ import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.util.StringUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -217,7 +218,7 @@ public class BatchRestController {
         Long searchUserId = currentUserId;
         if (authenticationUtil.hasAdminRole()) {
             // ユーザー名が指定されている場合、ユーザーIDに変換
-            if (userName != null && !userName.trim().isEmpty()) {
+            if (StringUtil.isTrimmedNotEmpty(userName)) {
                 searchUserId = userRepository.findByName(userName)
                         .map(user -> user.getId())
                         .orElse(null);

@@ -23,13 +23,9 @@ public class ProdCommandBuilder implements CommandBuilder {
     public List<String> buildCommand(BatchConfig.Job job) {
         List<String> command = new ArrayList<>();
         command.add(job.getCommand());
+        command.addAll(job.getArguments());
 
-        if (job.getArguments() != null && !job.getArguments().isEmpty()) {
-            command.addAll(job.getArguments());
-        }
-
-        log.debug("Built prod command: {} with arguments: {}", job.getCommand(),
-                job.getArguments() != null ? job.getArguments() : "none");
+        log.debug("Built prod command: {} with arguments: {}", job.getCommand(), job.getArguments());
 
         return command;
     }

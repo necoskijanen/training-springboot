@@ -17,8 +17,7 @@ public class UserController {
     @GetMapping("/home") // 👈 ログイン後にリダイレクトされるべきマッピング
     public String userHome(Model model) {
         // src/main/resources/templates/user/home.html を返す
-        String username = authenticationUtil.getAuthenticatedUsername();
-        model.addAttribute("username", username);
+        model.addAttribute("username", authenticationUtil.getAuthenticatedUsername());
         return "user/home";
     }
 

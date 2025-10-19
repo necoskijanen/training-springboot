@@ -24,13 +24,9 @@ public class DevCommandBuilder implements CommandBuilder {
         List<String> command = new ArrayList<>();
         String commandWithExtension = addOsSpecificExtension(job.getCommand());
         command.add(commandWithExtension);
+        command.addAll(job.getArguments());
 
-        if (job.getArguments() != null && !job.getArguments().isEmpty()) {
-            command.addAll(job.getArguments());
-        }
-
-        log.debug("Built dev command: {} with arguments: {}", commandWithExtension,
-                job.getArguments() != null ? job.getArguments() : "none");
+        log.debug("Built dev command: {} with arguments: {}", commandWithExtension, job.getArguments());
 
         return command;
     }

@@ -157,15 +157,11 @@ public class BatchService {
         List<String> command = commandBuilder.buildCommand(job);
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
-        // 作業ディレクトリを設定
-        if (job.getWorkingDirectory() != null && !job.getWorkingDirectory().isEmpty()) {
-            processBuilder.directory(new File(job.getWorkingDirectory()));
-        }
+        // 作業ディレクトリを設定（デフォルト値は"./"）
+        processBuilder.directory(new File(job.getWorkingDirectory()));
 
-        // 環境変数を設定
-        if (job.getEnvironment() != null && !job.getEnvironment().isEmpty()) {
-            processBuilder.environment().putAll(job.getEnvironment());
-        }
+        // 環境変数を設定（デフォルト値は空マップ）
+        processBuilder.environment().putAll(job.getEnvironment());
 
         // プロセスを開始
         long startTime = System.currentTimeMillis();
@@ -190,12 +186,9 @@ public class BatchService {
                 endTime - startTime);
 
         // ステータスを更新
-        String status;
-        if (exitCode == 0) {
-            status = ExecutionStatus.COMPLETED_SUCCESS.name();
-        } else {
-            status = ExecutionStatus.FAILED.name();
-        }
+        String status = exitCode == 0
+                ? ExecutionStatus.COMPLETED_SUCCESS.name()
+                : ExecutionStatus.FAILED.name();
         updateExecutionStatus(executionId, status, exitCode);
 
         // 更新された実行レコードを返す
