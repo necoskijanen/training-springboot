@@ -71,6 +71,8 @@ public class BatchRestController {
                         .id(job.getId())
                         .name(job.getName())
                         .description(job.getDescription())
+                        .command(job.getCommand())
+                        .arguments(job.getArguments())
                         .timeout(job.getTimeout())
                         .build())
                 .collect(Collectors.toList());
@@ -277,6 +279,8 @@ public class BatchRestController {
         private String id;
         private String name;
         private String description;
+        private String command;
+        private List<String> arguments;
         private int timeout;
     }
 
