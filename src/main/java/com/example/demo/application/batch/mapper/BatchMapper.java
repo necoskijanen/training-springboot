@@ -1,8 +1,8 @@
 package com.example.demo.application.batch.mapper;
 
 import com.example.demo.application.batch.dto.BatchHistoryResponse;
-import com.example.demo.presentation.BatchRestController.HistoryItem;
-import com.example.demo.presentation.BatchRestController.StatusResponse;
+import com.example.demo.application.batch.dto.HistoryItem;
+import com.example.demo.application.batch.dto.StatusResponse;
 import com.example.demo.domain.batch.BatchExecution;
 
 /**

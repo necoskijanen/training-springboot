@@ -1,6 +1,5 @@
 package com.example.demo.presentation;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,16 +20,17 @@ import com.example.demo.application.batch.BatchExecuteService;
 import com.example.demo.application.batch.BatchHistoryService;
 import com.example.demo.application.batch.dto.BatchHistoryPageResponse;
 import com.example.demo.application.batch.dto.BatchHistorySearchRequest;
+import com.example.demo.application.batch.dto.ExecuteRequest;
+import com.example.demo.application.batch.dto.ExecuteResponse;
+import com.example.demo.application.batch.dto.HistoryItem;
+import com.example.demo.application.batch.dto.HistoryResponse;
+import com.example.demo.application.batch.dto.JobResponse;
+import com.example.demo.application.batch.dto.StatusResponse;
 import com.example.demo.authentication.AuthenticationUtil;
 import com.example.demo.domain.batch.BatchExecution;
-import com.example.demo.domain.batch.ExecutionStatus;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
 import com.example.demo.util.PaginationHelper;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -78,18 +78,6 @@ public class BatchRestController {
         try {
             // メインスレッドで事前にユーザーIDを取得
             Long userId = authenticationUtil.getCurrentUserId();
-            log.info("Current userId: {}", userId);
-
-            if (userId == null) {
-                log.error("userId is null! Authentication: {}", authenticationUtil.getAuthentication());
-                log.error("Is authenticated: {}", authenticationUtil.isAuthenticated());
-                Object principal = authenticationUtil.getAuthentication() != null
-                        ? authenticationUtil.getAuthentication().getPrincipal()
-                        : null;
-                log.error("Principal: {}, Principal class: {}", principal,
-                        principal != null ? principal.getClass().getName() : "null");
-            }
-
             String executionId = batchService.startBatch(request.getJobId(), userId);
             return ResponseEntity.ok(new ExecuteResponse(executionId));
         } catch (IllegalArgumentException e) {
@@ -188,93 +176,4 @@ public class BatchRestController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * ジョブのDTOレスポンス
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class JobResponse {
-        private String id;
-        private String name;
-        private String description;
-        private String command;
-        private List<String> arguments;
-        private int timeout;
-    }
-
-    /**
-     * 実行リクエスト
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ExecuteRequest {
-        private String jobId;
-    }
-
-    /**
-     * 実行レスポンス
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class ExecuteResponse {
-        private String executionId;
-        private String error;
-
-        public ExecuteResponse(String executionId) {
-            this.executionId = executionId;
-            this.error = null;
-        }
-    }
-
-    /**
-     * ステータスレスポンス
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class StatusResponse {
-        private ExecutionStatus status;
-        private Integer exitCode;
-        private LocalDateTime startTime;
-        private LocalDateTime endTime;
-        private String jobName;
-    }
-
-    /**
-     * 履歴アイテム
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class HistoryItem {
-        private String id;
-        private String jobId;
-        private String jobName;
-        private ExecutionStatus status;
-        private LocalDateTime startTime;
-        private LocalDateTime endTime;
-        private Integer exitCode;
-    }
-
-    /**
-     * 履歴レスポンス（ページネーション対応）
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class HistoryResponse {
-        private List<HistoryItem> items;
-        private int page;
-        private int size;
-        private long totalCount;
-        private long totalPages;
-    }
 }

@@ -16,7 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.authentication.AuthenticationUtil;
+import com.example.demo.application.batch.dto.JobResponse;
+import com.example.demo.application.batch.dto.StatusResponse;
 import com.example.demo.application.batch.mapper.BatchMapper;
 import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
@@ -24,8 +25,6 @@ import com.example.demo.domain.batch.ExecutionStatus;
 import com.example.demo.domain.batch.exception.BatchDomainException;
 import com.example.demo.domain.batch.exception.BatchErrorCode;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
-import com.example.demo.presentation.BatchRestController.StatusResponse;
-import com.example.demo.presentation.BatchRestController.JobResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,9 +41,6 @@ public class BatchExecuteService {
 
     @Autowired
     private CommandBuilder commandBuilder;
-
-    @Autowired
-    private AuthenticationUtil authenticationUtil;
 
     @Autowired
     private BatchConfig batchConfig;
