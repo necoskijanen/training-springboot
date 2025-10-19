@@ -61,11 +61,11 @@
     box-shadow: 0 0 5px rgba(0, 102, 204, 0.2);
 }
 
-.admin-only {
+.form-group.admin-only {
     display: none;
 }
 
-.admin-only.visible {
+.form-group.admin-only.visible {
     display: flex;
 }
 
