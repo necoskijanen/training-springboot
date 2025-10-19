@@ -65,23 +65,6 @@
         WHERE id = #{id}
     </update>
 
-    <select id="findByUserIdWithPaging" resultMap="batchExecutionResultMap">
-        SELECT
-            id,
-            job_id,
-            job_name,
-            status,
-            exit_code,
-            user_id,
-            start_time,
-            end_time,
-            created_at
-        FROM batch_execution_history
-        WHERE user_id = #{userId}
-        ORDER BY start_time DESC
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
-
     <select id="countByUserId" parameterType="Long" resultType="long">
         SELECT COUNT(*)
         FROM batch_execution_history

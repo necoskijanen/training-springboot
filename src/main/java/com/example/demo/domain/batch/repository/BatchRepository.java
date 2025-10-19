@@ -1,7 +1,6 @@
 package com.example.demo.domain.batch.repository;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import com.example.demo.application.batch.dto.BatchSearchParams;
 import com.example.demo.domain.batch.BatchExecution;
@@ -36,17 +35,6 @@ public interface BatchRepository {
          * @param execution 実行レコード
          */
         void update(BatchExecution execution);
-
-        /**
-         * ユーザーの実行履歴をページング取得する
-         * 
-         * @param userId ユーザーID
-         * @param offset オフセット
-         * @param limit  件数制限
-         * @return バッチ実行レコードのリスト
-         */
-        List<BatchExecution> findByUserIdWithPaging(@Param("userId") Long userId, @Param("offset") int offset,
-                        @Param("limit") int limit);
 
         /**
          * ユーザーの実行履歴の総件数を取得する
