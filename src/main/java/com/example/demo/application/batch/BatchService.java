@@ -58,23 +58,14 @@ public class BatchService {
         BatchConfig.Job job = getJobByIdOptional(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobId));
 
-        // 実行IDを生成
-        String executionId = UUID.randomUUID().toString();
-
         // ユーザーIDを取得
         Long userId = authenticationUtil.getCurrentUserId();
 
-        // データベースに実行レコードを作成（status=RUNNING）
-        BatchExecution execution = BatchExecution.builder()
-                .id(executionId)
-                .jobId(jobId)
-                .jobName(job.getName())
-                .status(ExecutionStatus.RUNNING.name())
-                .userId(userId)
-                .startTime(LocalDateTime.now())
-                .createdAt(LocalDateTime.now())
-                .build();
+        // ドメインのファクトリメソッドを使用して実行を開始
+        BatchExecution execution = BatchExecution.startNew(jobId, job.getName(), userId);
+        String executionId = execution.getId();
 
+        // データベースに実行レコードを作成
         batchExecutionRepository.insert(execution);
         log.info("Created execution record: {}", executionId);
 
@@ -131,7 +122,7 @@ public class BatchService {
                     .orElseGet(() -> {
                         BatchExecution execution = new BatchExecution();
                         execution.setId(executionId);
-                        execution.setStatus(ExecutionStatus.RUNNING.name());
+                        execution.setStatus(ExecutionStatus.RUNNING);
                         return execution;
                     });
         }
@@ -174,7 +165,8 @@ public class BatchService {
         if (!finished) {
             log.warn("Batch execution timeout: {}", executionId);
             process.destroyForcibly();
-            updateExecutionStatus(executionId, ExecutionStatus.FAILED.name(), 124); // Timeout exit code
+            // ドメインメソッドでタイムアウトを処理
+            updateExecutionWithDomain(executionId, execution -> execution.timeout());
             return batchExecutionRepository.findById(executionId).orElse(null);
         }
 
@@ -183,11 +175,12 @@ public class BatchService {
         log.info("Batch execution completed: {}, exitCode: {}, duration: {}ms", executionId, exitCode,
                 endTime - startTime);
 
-        // ステータスを更新
-        String status = exitCode == 0
-                ? ExecutionStatus.COMPLETED_SUCCESS.name()
-                : ExecutionStatus.FAILED.name();
-        updateExecutionStatus(executionId, status, exitCode);
+        // ドメインメソッドでステータスを更新
+        if (exitCode == 0) {
+            updateExecutionWithDomain(executionId, execution -> execution.completeSuccessfully());
+        } else {
+            updateExecutionWithDomain(executionId, execution -> execution.completeFailed(exitCode));
+        }
 
         // 更新された実行レコードを返す
         return batchExecutionRepository.findById(executionId).orElse(null);
@@ -201,7 +194,7 @@ public class BatchService {
      * @return 実行レコード
      */
     private BatchExecution handleExecutionError(String executionId, Exception e) {
-        updateExecutionStatus(executionId, ExecutionStatus.FAILED.name(), 1);
+        updateExecutionWithDomain(executionId, execution -> execution.completeFailed(1));
         return batchExecutionRepository.findById(executionId).orElse(null);
     }
 
@@ -237,19 +230,21 @@ public class BatchService {
     }
 
     /**
-     * 実行ステータスを更新する
+     * ドメインメソッドを使用して実行ステータスを更新する
      * 
      * @param executionId 実行ID
-     * @param status      ステータス
-     * @param exitCode    終了コード
+     * @param updater     実行オブジェクトを更新する関数型インターフェース
      */
-    private void updateExecutionStatus(String executionId, String status, Integer exitCode) {
+    private void updateExecutionWithDomain(String executionId, java.util.function.Consumer<BatchExecution> updater) {
         batchExecutionRepository.findById(executionId).ifPresent(execution -> {
-            execution.setStatus(status);
-            execution.setExitCode(exitCode);
-            execution.setEndTime(LocalDateTime.now());
-            batchExecutionRepository.update(execution);
-            log.info("Updated execution status: {}, status: {}, exitCode: {}", executionId, status, exitCode);
+            try {
+                updater.accept(execution);
+                batchExecutionRepository.update(execution);
+                log.info("Updated execution status: {}, status: {}, exitCode: {}", executionId, execution.getStatus(),
+                        execution.getExitCode());
+            } catch (com.example.demo.domain.batch.exception.BatchDomainException e) {
+                log.warn("Domain validation failed: {}", e.getMessage());
+            }
         });
     }
 }

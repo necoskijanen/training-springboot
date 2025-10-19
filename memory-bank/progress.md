@@ -89,6 +89,83 @@
 
 ## What's Left to Build
 
+### ✅ Domain Model Refactoring - DDD Implementation (Completed) ★ Phase 3
+
+#### User Entity Enhancement
+- **Priority**: High
+- **Status**: ✅ COMPLETED
+- **Implemented Methods**:
+  - `updateUserInfo(String name, String email, Boolean admin)` - with validation for self-admin-revocation
+  - `isActive()` - status check
+  - `isAdmin()` - admin flag check
+  - `hasRole(String roleName)` - role membership check
+  - `isPasswordValid(String rawPassword, PasswordEncoder encoder)` - password validation
+  - `createNewUser()` - static factory method
+
+- **Files Modified**:
+  - `src/main/java/com/example/demo/domain/user/User.java` - Enhanced to Rich Domain Model
+  - `src/main/java/com/example/demo/application/user/UserService.java` - Refactored to delegate to domain
+
+- **Outcome**:
+  - ✅ UserService simplified (uses domain methods)
+  - ✅ Domain model encapsulates business rules
+  - ✅ Type safety improved
+
+#### BatchExecution Entity Enhancement
+- **Priority**: High
+- **Status**: ✅ COMPLETED
+- **Implemented Methods**:
+  - `startNew(String jobId, String jobName, Long userId)` - static factory method
+  - `completeSuccessfully()` - state transition with validation
+  - `completeFailed(int exitCode)` - state transition with exit code validation
+  - `timeout()` - timeout handling (-1 exit code)
+  - `isRunning()`, `isCompleted()`, `isSuccessful()` - status query methods
+  - Changed `status` from String to `ExecutionStatus` enum (type-safe)
+
+- **Files Created/Modified**:
+  - `src/main/java/com/example/demo/domain/batch/BatchExecution.java` - Enhanced entity
+  - `src/main/java/com/example/demo/domain/batch/exception/BatchDomainException.java` - Domain exception
+  - `src/main/java/com/example/demo/application/batch/BatchService.java` - Refactored to use domain methods
+
+- **Outcome**:
+  - ✅ Type safety via ExecutionStatus enum
+  - ✅ Invalid state transitions prevented at domain level
+  - ✅ Service layer simplified
+  - ✅ Better error handling with domain exceptions
+
+#### Role Entity Enhancement
+- **Priority**: Medium
+- **Status**: ✅ COMPLETED
+- **Implemented Methods**:
+  - `isAdmin()` - check if admin role
+  - `isUser()` - check if user role
+  - `canManageUsers()` - permission check
+  - `canViewBatchHistory()` - permission check
+  - `canExecuteBatch()` - permission check
+
+- **Files Modified**:
+  - `src/main/java/com/example/demo/domain/user/Role.java` - Enhanced with permission methods
+
+- **Outcome**:
+  - ✅ Centralized permission logic
+  - ✅ Easier future role/permission extensions
+
+#### MyBatis Mapping Updates
+- **Priority**: High
+- **Status**: ✅ COMPLETED
+- **Changes**:
+  - Added `batchExecutionResultMap` with `EnumTypeHandler` for ExecutionStatus
+  - Updated all SELECT queries to use resultMap instead of resultType
+  - Proper enum serialization/deserialization configured
+
+- **Files Modified**:
+  - `src/main/resources/mapper/batch/BatchExecutionRepository.xml` - Updated mappings
+
+- **Outcome**:
+  - ✅ ExecutionStatus enum properly handled in database layer
+  - ✅ Type-safe status mapping
+  - ✅ Full integration with domain model
+
 ### 🔄 Logging System (Not Started)
 
 #### Structured Logging
@@ -269,6 +346,32 @@ None identified (no load testing performed)
 - **Completeness**: Core files established
 
 ## Next Milestone
+
+### Milestone 3: Domain Model Refactoring (DDD)
+**Target**: Implement Rich Domain Models and improve responsibility separation
+
+**Deliverables**:
+1. User entity with business logic methods
+2. BatchExecution entity with state management and type safety
+3. Role entity with permission check methods
+4. Updated Service layer to delegate to domain models
+5. Domain-level validation and error handling
+
+**Success Criteria**:
+- Service layer reduced by 40-50 lines total
+- All business rules encapsulated in domain models
+- Invalid state transitions prevented
+- Unit tests simplified (reduced mocking)
+- Type safety improved (enum for status)
+
+**Estimated Effort**: 4-6 hours
+- Analysis & Planning: 1 hour
+- User Entity: 1 hour
+- BatchExecution Entity: 1.5 hours
+- Role Entity: 0.5 hours
+- Testing & Refactoring: 1.5 hours
+
+---
 
 ### Milestone 2: Logging & Monitoring
 **Target**: Implement comprehensive logging system

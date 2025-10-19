@@ -68,15 +68,12 @@ public class UserService {
             throw new UserDomainException(UserErrorCode.DUPLICATE_NAME);
         }
 
-        // ユーザオブジェクトを構築
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setIsActive(true);
-        user.setAdmin(request.getAdmin());
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        // ドメインのファクトリメソッドを使用してユーザを作成
+        User user = User.createNewUser(
+                request.getName(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getAdmin());
 
         // ユーザを挿入
         userRepository.insert(user);
@@ -113,17 +110,8 @@ public class UserService {
             }
         }
 
-        // 管理者が自身の権限を削除しようとしていないか確認
-        if (existingUser.getId().equals(request.getId()) && existingUser.getAdmin() && !request.getAdmin()) {
-            log.warn("User update failed: admin user cannot revoke own admin rights: id={}", request.getId());
-            throw new UserDomainException(UserErrorCode.CANNOT_REVOKE_OWN_ADMIN_RIGHTS);
-        }
-
-        // ユーザオブジェクトを更新
-        existingUser.setName(request.getName());
-        existingUser.setEmail(request.getEmail());
-        existingUser.setAdmin(request.getAdmin());
-        existingUser.setUpdatedAt(LocalDateTime.now());
+        // ドメインメソッドに委譲して更新（状態遷移とバリデーションを実行）
+        existingUser.updateUserInfo(request.getName(), request.getEmail(), request.getAdmin());
 
         // ユーザを更新
         userRepository.update(existingUser);

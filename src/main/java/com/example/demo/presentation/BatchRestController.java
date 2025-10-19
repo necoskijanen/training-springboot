@@ -22,6 +22,7 @@ import com.example.demo.application.batch.dto.BatchHistoryResponse;
 import com.example.demo.authentication.AuthenticationUtil;
 import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
+import com.example.demo.domain.batch.ExecutionStatus;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.util.StringUtil;
@@ -323,7 +324,7 @@ public class BatchRestController {
     @AllArgsConstructor
     @Builder
     public static class StatusResponse {
-        private String status;
+        private ExecutionStatus status;
         private Integer exitCode;
         private LocalDateTime startTime;
         private LocalDateTime endTime;
@@ -341,7 +342,7 @@ public class BatchRestController {
         private String id;
         private String jobId;
         private String jobName;
-        private String status;
+        private ExecutionStatus status;
         private LocalDateTime startTime;
         private LocalDateTime endTime;
         private Integer exitCode;
