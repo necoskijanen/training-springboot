@@ -60,18 +60,24 @@
     border-collapse: collapse;
     margin-bottom: 15px;
     background: white;
+    font-size: 13px;
 }
 
 .parameters-table th,
 .parameters-table td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 8px;
     text-align: left;
 }
 
 .parameters-table th {
     background: #f0f0f0;
     font-weight: bold;
+    font-size: 12px;
+}
+
+.parameters-table td {
+    font-size: 13px;
 }
 
 .history-section {
