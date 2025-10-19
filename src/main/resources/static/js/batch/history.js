@@ -50,8 +50,6 @@ function performSearch() {
     const jobName = document.getElementById('jobName').value.trim();
     const status = document.getElementById('status').value;
     const startDateFrom = document.getElementById('startDateFrom').value;
-    const startDateTo = document.getElementById('startDateTo').value;
-    const endDateFrom = document.getElementById('endDateFrom').value;
     const endDateTo = document.getElementById('endDateTo').value;
     const userId = document.getElementById('userId').value;
 
@@ -69,12 +67,6 @@ function performSearch() {
     }
     if (startDateFrom) {
         params.append('startDateFrom', startDateFrom);
-    }
-    if (startDateTo) {
-        params.append('startDateTo', startDateTo);
-    }
-    if (endDateFrom) {
-        params.append('endDateFrom', endDateFrom);
     }
     if (endDateTo) {
         params.append('endDateTo', endDateTo);
@@ -188,8 +180,6 @@ function goToPage(pageNumber) {
     const jobName = document.getElementById('jobName').value.trim();
     const status = document.getElementById('status').value;
     const startDateFrom = document.getElementById('startDateFrom').value;
-    const startDateTo = document.getElementById('startDateTo').value;
-    const endDateFrom = document.getElementById('endDateFrom').value;
     const endDateTo = document.getElementById('endDateTo').value;
     const userId = document.getElementById('userId').value;
 
@@ -207,12 +197,6 @@ function goToPage(pageNumber) {
     }
     if (startDateFrom) {
         params.append('startDateFrom', startDateFrom);
-    }
-    if (startDateTo) {
-        params.append('startDateTo', startDateTo);
-    }
-    if (endDateFrom) {
-        params.append('endDateFrom', endDateFrom);
     }
     if (endDateTo) {
         params.append('endDateTo', endDateTo);
@@ -296,8 +280,6 @@ function clearForm() {
     document.getElementById('jobName').value = '';
     document.getElementById('status').value = '';
     document.getElementById('startDateFrom').value = '';
-    document.getElementById('startDateTo').value = '';
-    document.getElementById('endDateFrom').value = '';
     document.getElementById('endDateTo').value = '';
     document.getElementById('userId').value = '';
 

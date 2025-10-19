@@ -98,22 +98,12 @@
             </if>
             <if test="startDateFrom != null">
                 <![CDATA[
-                AND DATE(start_time) >= #{startDateFrom}
-                ]]>
-            </if>
-            <if test="startDateTo != null">
-                <![CDATA[
-                AND DATE(start_time) <= #{startDateTo}
-                ]]>
-            </if>
-            <if test="endDateFrom != null">
-                <![CDATA[
-                AND DATE(end_time) >= #{endDateFrom}
+                AND start_time >= #{startDateFrom}
                 ]]>
             </if>
             <if test="endDateTo != null">
                 <![CDATA[
-                AND DATE(end_time) <= #{endDateTo}
+                AND end_time <= #{endDateTo}
                 ]]>
             </if>
         </where>
@@ -136,22 +126,12 @@
             </if>
             <if test="startDateFrom != null">
                 <![CDATA[
-                AND DATE(start_time) >= #{startDateFrom}
-                ]]>
-            </if>
-            <if test="startDateTo != null">
-                <![CDATA[
-                AND DATE(start_time) <= #{startDateTo}
-                ]]>
-            </if>
-            <if test="endDateFrom != null">
-                <![CDATA[
-                AND DATE(end_time) >= #{endDateFrom}
+                AND start_time >= #{startDateFrom}
                 ]]>
             </if>
             <if test="endDateTo != null">
                 <![CDATA[
-                AND DATE(end_time) <= #{endDateTo}
+                AND end_time <= #{endDateTo}
                 ]]>
             </if>
         </where>

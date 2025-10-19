@@ -23,8 +23,10 @@
 
                 <form id="searchForm" class="search-form">
                     <div class="form-group">
-                        <label for="jobName">ジョブ名</label>
-                        <input type="text" id="jobName" placeholder="入力不要">
+                        <label for="userId">実行ユーザ</label>
+                        <select id="userId" class="admin-only">
+                            <option value="">すべてのユーザー</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -38,28 +40,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label>開始日時</label>
-                        <div class="date-range">
-                            <input type="date" id="startDateFrom" placeholder="From">
-                            <span class="date-range-label">～</span>
-                            <input type="date" id="startDateTo" placeholder="To">
-                        </div>
+                        <label for="jobName">ジョブ名</label>
+                        <input type="text" id="jobName" placeholder="入力不要">
                     </div>
 
                     <div class="form-group">
-                        <label>終了日時</label>
-                        <div class="date-range">
-                            <input type="date" id="endDateFrom" placeholder="From">
-                            <span class="date-range-label">～</span>
-                            <input type="date" id="endDateTo" placeholder="To">
-                        </div>
+                        <label for="startDateFrom">開始日時</label>
+                        <input type="datetime-local" id="startDateFrom" placeholder="yyyy-mm-dd hh:mm:ss">
                     </div>
 
-                    <div class="form-group admin-only" id="userSelectionGroup">
-                        <label for="userId">ユーザー</label>
-                        <select id="userId">
-                            <option value="">すべてのユーザー</option>
-                        </select>
+                    <div class="form-group">
+                        <label for="endDateTo">終了日時</label>
+                        <input type="datetime-local" id="endDateTo" placeholder="yyyy-mm-dd hh:mm:ss">
                     </div>
 
                     <div class="search-buttons">

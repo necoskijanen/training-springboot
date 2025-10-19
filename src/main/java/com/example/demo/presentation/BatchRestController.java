@@ -186,10 +186,8 @@ public class BatchRestController {
      * 
      * @param jobName       バッチ名（部分一致）
      * @param status        ステータス
-     * @param startDateFrom 開始日時（開始）
-     * @param startDateTo   開始日時（終了）
-     * @param endDateFrom   終了日時（開始）
-     * @param endDateTo     終了日時（終了）
+     * @param startDateFrom ジョブ開始日時の下限（datetime-local形式）
+     * @param endDateTo     ジョブ終了日時の上限（datetime-local形式）
      * @param userId        実行ユーザーID（管理者用）
      * @param page          ページ番号（0 から開始）
      * @param size          ページサイズ（デフォルト10）
@@ -199,14 +197,13 @@ public class BatchRestController {
     public ResponseEntity<BatchHistoryPageResponse> searchBatchHistory(
             @RequestParam(required = false) String jobName,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) LocalDate startDateFrom,
-            @RequestParam(required = false) LocalDate startDateTo,
-            @RequestParam(required = false) LocalDate endDateFrom,
-            @RequestParam(required = false) LocalDate endDateTo,
+            @RequestParam(required = false) LocalDateTime startDateFrom,
+            @RequestParam(required = false) LocalDateTime endDateTo,
             @RequestParam(required = false) Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("Search batch history: jobName={}, status={}, page={}, size={}", jobName, status, page, size);
+        log.info("Search batch history: jobName={}, status={}, startDateFrom={}, endDateTo={}, page={}, size={}",
+                jobName, status, startDateFrom, endDateTo, page, size);
 
         Long currentUserId = authenticationUtil.getCurrentUserId();
         if (currentUserId == null) {
@@ -225,11 +222,11 @@ public class BatchRestController {
 
         // 検索を実行
         List<BatchExecution> executions = batchExecutionRepository.searchBatchExecution(
-                searchUserId, jobName, status, startDateFrom, startDateTo, endDateFrom, endDateTo, offset, limit);
+                searchUserId, jobName, status, startDateFrom, endDateTo, offset, limit);
 
         // 総件数を取得
         long totalCount = batchExecutionRepository.countBatchExecution(
-                searchUserId, jobName, status, startDateFrom, startDateTo, endDateFrom, endDateTo);
+                searchUserId, jobName, status, startDateFrom, endDateTo);
 
         // レスポンスを構築
         List<BatchHistoryResponse> items = executions.stream()
