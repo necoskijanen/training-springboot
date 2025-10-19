@@ -2,14 +2,71 @@
 
 ## Current Work Focus
 
-### Batch History Search Implementation - IN PROGRESS
+### Batch History Search Implementation - COMPLETED ✅
 - Backend API for advanced batch history search with filtering and pagination
 - Support for role-based access control (admin can search all users, users can search own history)
 - Search conditions: job name, status, date ranges (start/end)
 - Pagination: 10 items per page with page navigation (previous/next/page number)
-- Status: 🔄 BACKEND COMPLETED, FRONTEND PENDING
+- Status: ✅ BACKEND & FRONTEND COMPLETED
 
 ## Recent Changes
+
+### 2025/10/19 - Batch History Search Frontend Implementation (午後終盤)
+
+#### History Page with Search
+- **URL**: `/admin/batch/history`, `/user/batch/history` (with integrated search form)
+- **File**: `src/main/resources/templates/batch/history.html`
+- **Status**: ✅ COMPLETED
+
+#### CSS Styling
+- **File**: `src/main/resources/static/css/batch/search.css`
+- **Features**:
+  - Search form with grid layout
+  - Form groups for job name, status, date ranges
+  - Date range layout with "to" separator
+  - Admin-only user selection field
+  - Search and Clear buttons
+  - Results table with status badges (Running, Success, Failed)
+  - Pagination controls (Previous/Next/Page indicator)
+  - Error message display
+  - Loading indicator
+  - Responsive design
+- **Status**: ✅ COMPLETED
+
+#### Frontend JavaScript Implementation
+- **Files**: 
+  - `src/main/resources/static/js/batch/search.js` - For dedicated search page
+  - `src/main/resources/static/js/batch/history.js` - For history page (sidebar integration)
+- **Features**:
+  - `initializeSearch()` - Setup event listeners and check admin status
+  - `checkAdminStatus()` - Determine if user is admin via URL path
+  - `performSearch()` - Build query params and call `/api/batch/history/search`
+  - `displayResults()` - Populate table with search results and update pagination
+  - `goToPage()` - Handle pagination navigation
+  - `createStatusBadge()` - Create color-coded status badges (yellow/green/red)
+  - `formatDateTime()` - Format dates for display
+  - `clearForm()` - Reset search form and hide results
+  - `showError()/hideError()` - Error message handling
+  - `showLoading()` - Show/hide loading indicator
+- **Vanilla JavaScript**: No frameworks, pure fetch API + DOM manipulation
+- **Status**: ✅ COMPLETED
+
+#### BatchController Routes
+- **Added Routes**:
+  - `GET /batch/admin/search` → `batch/search` template
+  - `GET /batch/user/search` → `batch/search` template
+- **File**: `src/main/java/com/example/demo/presentation/BatchController.java`
+- **Status**: ✅ COMPLETED
+
+#### Integration Points
+- **API Endpoint**: Uses existing `GET /api/batch/history/search`
+- **Query Parameters**: jobName, status, startDateFrom, startDateTo, endDateFrom, endDateTo, userId, page, size
+- **Response Fields**: jobName, status, userName (admin only), startTime, endTime, exitCode
+- **Pagination**: totalCount, totalPages, currentPage, hasNextPage, hasPrevPage
+- **Role-Based Filtering**: 
+  - Admin users see userHeaderCell column with user names
+  - Regular users only see their own history
+- **Status**: ✅ COMPLETED
 
 ### 2025/10/19 - Batch History Search Backend Implementation (午後中期)
 
@@ -173,33 +230,28 @@
 
 ## Next Steps
 
-### Immediate: Batch History Search Frontend Implementation
-1. **Search Form Page Creation**
-   - URL: `/admin/batch/search` for admins, `/user/batch/search` for users
-   - Form fields:
-     - Job name: text input (optional)
-     - Status: dropdown (RUNNING, COMPLETED_SUCCESS, FAILED) or All
-     - Start date range: two `<input type="date">` fields
-     - End date range: two `<input type="date">` fields
-     - User selection: dropdown (admin only - fetch user list from API)
-     - Search button: calls `/api/batch/history/search`
+### Immediate: Testing & Validation
+1. **Manual Testing**
+   - Test search page at `/admin/batch/search` and `/user/batch/search`
+   - Verify search functionality with various filter combinations
+   - Test pagination (previous/next buttons)
+   - Verify status badges display correctly
+   - Test admin-only user column visibility
 
-2. **Results Display**
-   - Table showing search results with columns: Job Name, Status, User (admin only), Start Time, End Time, Exit Code
-   - Status displayed with color-coded badges
-   - Click to view details (optional for now)
+2. **Error Scenarios**
+   - Test with empty search results
+   - Test API error handling
+   - Test network error handling
 
-3. **Pagination Controls**
-   - Page size: 10 items per page (fixed)
-   - Navigation: Previous button, page number display, Next button
-   - All controls update based on totalPages from API response
+3. **Role-Based Access**
+   - Verify admin can see user column
+   - Verify regular users cannot see user column
+   - Verify regular users can only search their own history
 
-4. **JavaScript Implementation**
-   - Vanilla JavaScript (no framework)
-   - Form validation before search
-   - API call to `/api/batch/history/search`
-   - DOM manipulation to display results
-   - Clear search button to reset form
+4. **Integration**
+   - Test sidebar navigation to `/admin/batch/history`
+   - Verify history page loads search form
+   - Test search from history page
 
 ### Future: Logging System Implementation
 1. **Structured JSON Logging**

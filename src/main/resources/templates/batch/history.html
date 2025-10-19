@@ -2,8 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ja">
 
 <head>
-    <title>バッチ履歴画面</title>
+    <title>バッチ履歴検索</title>
     <th:block th:insert="~{fragments/header :: head}"></th:block>
+    <link rel="stylesheet" href="/css/batch/history.css">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
 </head>
 
 <body class="theme-admin">
@@ -13,11 +16,100 @@
         <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
 
         <main role="main">
-            <h1>バッチ履歴画面</h1>
+            <h1>バッチ履歴検索</h1>
+
+            <div class="search-container">
+                <div class="error-message" id="errorMessage"></div>
+
+                <form id="searchForm" class="search-form">
+                    <div class="form-group">
+                        <label for="jobName">ジョブ名</label>
+                        <input type="text" id="jobName" placeholder="入力不要">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">ステータス</label>
+                        <select id="status">
+                            <option value="">すべて</option>
+                            <option value="RUNNING">実行中</option>
+                            <option value="COMPLETED_SUCCESS">成功</option>
+                            <option value="FAILED">失敗</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>開始日時</label>
+                        <div class="date-range">
+                            <input type="date" id="startDateFrom" placeholder="From">
+                            <span class="date-range-label">～</span>
+                            <input type="date" id="startDateTo" placeholder="To">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>終了日時</label>
+                        <div class="date-range">
+                            <input type="date" id="endDateFrom" placeholder="From">
+                            <span class="date-range-label">～</span>
+                            <input type="date" id="endDateTo" placeholder="To">
+                        </div>
+                    </div>
+
+                    <div class="form-group admin-only" id="userSelectionGroup">
+                        <label for="userId">ユーザー</label>
+                        <select id="userId">
+                            <option value="">すべてのユーザー</option>
+                        </select>
+                    </div>
+
+                    <div class="search-buttons">
+                        <button type="button" class="btn-search" id="searchBtn">検索</button>
+                        <button type="button" class="btn-clear" id="clearBtn">クリア</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="results-container" id="resultsContainer" style="display: none;">
+                <div class="results-info" id="resultsInfo"></div>
+
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th id="userHeaderCell" style="display: none;">実行ユーザ</th>
+                            <th>実行ID</th>
+                            <th>ジョブ名</th>
+                            <th>開始時刻</th>
+                            <th>終了時刻</th>
+                            <th>ステータス</th>
+                            <th>終了コード</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                    </tbody>
+                </table>
+
+                <div class="pagination" id="paginationContainer">
+                    <button id="prevBtn" class="pagination-btn">＜ 前へ</button>
+                    <span class="page-info">
+                        ページ <span id="currentPage">1</span> / <span id="totalPages">1</span>
+                    </span>
+                    <button id="nextBtn" class="pagination-btn">次へ ＞</button>
+                </div>
+            </div>
+
+            <div class="no-results" id="noResults" style="display: none;">
+                検索結果がありません。検索条件を変更してください。
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                読み込み中です...
+            </div>
         </main>
     </div>
 
     <div th:replace="~{fragments/header :: footer}"></div>
+
+    <script src="/js/batch/history.js"></script>
 </body>
 
 </html>
