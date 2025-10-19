@@ -3,6 +3,18 @@
 
 <mapper namespace="com.example.demo.domain.batch.repository.BatchRepository">
 
+    <sql id="batchExecutionColumns">
+        id,
+        job_id,
+        job_name,
+        status,
+        exit_code,
+        user_id,
+        start_time,
+        end_time,
+        created_at
+    </sql>
+
     <!-- BatchExecution resultMap with ExecutionStatus enum type handler -->
     <resultMap id="batchExecutionResultMap" type="com.example.demo.domain.batch.BatchExecution">
         <id column="id" property="id" />
@@ -42,15 +54,7 @@
 
     <select id="findById" parameterType="String" resultMap="batchExecutionResultMap">
         SELECT
-            id,
-            job_id,
-            job_name,
-            status,
-            exit_code,
-            user_id,
-            start_time,
-            end_time,
-            created_at
+            <include refid="batchExecutionColumns"/>
         FROM batch_execution_history
         WHERE id = #{id}
         LIMIT 1
@@ -74,15 +78,7 @@
     <!-- BatchSearchParams を使用した検索（パラメータオブジェクト版） -->
     <select id="searchBatchExecution" parameterType="com.example.demo.application.batch.dto.BatchSearchParams" resultMap="batchExecutionResultMap">
         SELECT
-            id,
-            job_id,
-            job_name,
-            status,
-            exit_code,
-            user_id,
-            start_time,
-            end_time,
-            created_at
+            <include refid="batchExecutionColumns"/>
         FROM batch_execution_history
         <where>
             <if test="userId != null">

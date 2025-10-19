@@ -4,6 +4,19 @@
 <!-- filepath: src/main/resources/mapper/user/UserRepository.xml -->
 <mapper namespace="com.example.demo.domain.user.repository.UserRepository">
 
+    <sql id="userColumns">
+        u.id,
+        u.name,
+        u.email,
+        u.password,
+        u.is_active,
+        u.admin,
+        u.created_at,
+        u.updated_at,
+        r.id as role_id,
+        r.name as role_name
+    </sql>
+
     <resultMap id="userResultMap" type="com.example.demo.domain.user.User">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
@@ -21,16 +34,7 @@
 
     <select id="findByName" resultMap="userResultMap">
         SELECT
-            u.id,
-            u.name,
-            u.email,
-            u.password,
-            u.is_active,
-            u.admin,
-            u.created_at,
-            u.updated_at,
-            r.id as role_id,
-            r.name as role_name
+            <include refid="userColumns"/>
         FROM
             user_master u
         LEFT JOIN
@@ -43,16 +47,7 @@
 
     <select id="findById" resultMap="userResultMap">
         SELECT
-            u.id,
-            u.name,
-            u.email,
-            u.password,
-            u.is_active,
-            u.admin,
-            u.created_at,
-            u.updated_at,
-            r.id as role_id,
-            r.name as role_name
+            <include refid="userColumns"/>
         FROM
             user_master u
         LEFT JOIN
@@ -65,16 +60,7 @@
 
     <select id="searchUsers" resultMap="userResultMap">
         SELECT
-            u.id,
-            u.name,
-            u.email,
-            u.password,
-            u.is_active,
-            u.admin,
-            u.created_at,
-            u.updated_at,
-            r.id as role_id,
-            r.name as role_name
+            <include refid="userColumns"/>
         FROM
             user_master u
         LEFT JOIN
@@ -123,16 +109,7 @@
 
     <select id="findAll" resultMap="userResultMap">
         SELECT
-            u.id,
-            u.name,
-            u.email,
-            u.password,
-            u.is_active,
-            u.admin,
-            u.created_at,
-            u.updated_at,
-            r.id as role_id,
-            r.name as role_name
+            <include refid="userColumns"/>
         FROM
             user_master u
         LEFT JOIN
@@ -144,16 +121,7 @@
 
     <select id="findByIds" resultMap="userResultMap">
         SELECT
-            u.id,
-            u.name,
-            u.email,
-            u.password,
-            u.is_active,
-            u.admin,
-            u.created_at,
-            u.updated_at,
-            r.id as role_id,
-            r.name as role_name
+            <include refid="userColumns"/>
         FROM
             user_master u
         LEFT JOIN
