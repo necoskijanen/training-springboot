@@ -10,14 +10,28 @@
 
 ## Recent Changes
 
-### 2025/10/19 - Batch Infrastructure Implementation & Memory Bank Update
+### 2025/10/19 - CommandBuilder Strategy Pattern Implementation (午後)
+- **CommandBuilder.java**: Interface created for environment-specific command building
+- **DevCommandBuilder.java**: Implements CommandBuilder for development environment
+  - `@Profile("dev")` annotation for dev profile activation
+  - OS detection using `System.getProperty("os.name")`
+  - Automatic extension appending: `.sh` for Linux/Mac, `.bat` for Windows
+- **ProdCommandBuilder.java**: Implements CommandBuilder for production environment
+  - `@Profile("prod")` annotation for prod profile activation
+  - No extension appending - uses command name as-is
+- **BatchService.java**: Modified to inject CommandBuilder and delegate command building
+- **application.yml**: Added `spring.profiles.active: dev` for default development profile
+- **batch/config.yml**: Specifies commands without extensions (e.g., `command: wait_time`)
+- **Architecture**: Strategy Pattern enables clean separation of environment-specific behavior
+- **Status**: CommandBuilder実装完了、バッチ起動画面実装完了
+
+### 2025/10/19 - Batch Infrastructure Implementation & Memory Bank Update (午前)
 - **BatchController.java**: Routes for batch UI pages at `/admin/batch/start`, `/user/batch/start`, `/admin/batch/history`, `/user/batch/history`
 - **BatchService.java**: Service class created with @Service, @Slf4j, and @Transactional annotations
 - **BatchConfig.java**: Configuration properties mapping batch job definitions from YAML
 - **batch/config.yml**: Job definitions with wait_time_test and wait_time_error test jobs
 - **UI Templates**: batch/start.html and batch/history.html templates created
 - **Test Scripts**: wait_time.sh and wait_time.bat for batch execution testing
-- **Memory Bank Update**: Updating activeContext.md and progress.md to reflect current implementation state
 
 ### 2025/10/17 - Memory Bank Creation
 - **Created**: `projectbrief.md` - Project scope, goals, requirements

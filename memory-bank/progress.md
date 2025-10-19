@@ -115,25 +115,35 @@
   - Add logging to security components
   - Include error causes and locations
 
-### 🔄 Batch Processing (Not Started)
+### 🔄 Batch Processing (In Progress)
 
 #### Batch Execution Infrastructure
 - **Priority**: High
-- **Tasks**:
-  - Create domain models (BatchJob, BatchExecution, ExecutionStatus)
+- **Status**: Partially completed
+- **Completed Tasks**:
+  - ✅ BatchConfig created for YAML-based job configuration
+  - ✅ BatchService layer with @Transactional and @Async support
+  - ✅ CommandBuilder strategy pattern for environment-specific command building
+  - ✅ DevCommandBuilder: automatic OS-specific extension appending (.sh/.bat)
+  - ✅ ProdCommandBuilder: command name without extension appending
+  - ✅ ProcessBuilder-based execution framework in place
+- **Remaining Tasks**:
+  - Create domain models (BatchExecution, ExecutionStatus enum)
   - Design and implement database schema for batch history
-  - Create batch service layer
-  - Implement ProcessBuilder-based execution
-  - Configure batch program directory in application.yml
-  - Add @Async configuration for asynchronous execution
+  - Implement @Async configuration for asynchronous execution
+  - Add UUID-based execution ID management
+  - Implement execution status tracking
 
 #### Batch Controller & UI
 - **Priority**: High
-- **Tasks**:
-  - Create BatchController with execution endpoints
-  - Implement program selection interface
-  - Create execution trigger UI
-  - Add real-time status display
+- **Status**: Completed
+- **Completed Tasks**:
+  - ✅ BatchController with UI routing endpoints
+  - ✅ batch/start.html template created and implemented
+  - ✅ batch/history.html template created
+  - ✅ Job selection interface
+  - ✅ Execution trigger UI
+  - ✅ バッチ起動画面実装完了
 
 #### Status Monitoring API
 - **Priority**: High
@@ -189,11 +199,11 @@
 - **Next Sprint**: Phase 2 (Logging Implementation)
 
 ### Feature Completion
-- **Completed**: 2 of 6 major features (33%)
+- **Completed**: 2.5 of 6 major features (42%)
   1. ✅ Login/Logout
   2. ✅ Role-based home screens
   3. ⏳ Logging system
-  4. ⏳ Batch execution
+  4. 🔄 Batch execution (UI & command building completed, service layer in progress)
   5. ⏳ Batch history
   6. ⏳ Pagination
 
