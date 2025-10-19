@@ -1,12 +1,12 @@
 .batch-form {
     background: #f9f9f9;
-    padding: 20px;
+    padding: 10px;
     border-radius: 8px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1px;
 }
 
 .form-group label {
@@ -26,7 +26,7 @@
 .button-group {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .button-group button {
@@ -58,7 +58,7 @@
 .parameters-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     background: white;
 }
 
@@ -75,7 +75,7 @@
 }
 
 .history-section {
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
 .history-table {
@@ -101,6 +101,7 @@
     gap: 10px;
     margin-top: 20px;
     align-items: center;
+    justify-content: center;
 }
 
 .pagination button {
