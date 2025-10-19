@@ -22,17 +22,10 @@ VALUES
 -- ロールの投入
 INSERT INTO role_definition (name)
 VALUES 
- ('ADMIN')
-,('USER')
+ ('EXECUTE_BATCH')
+,('MANAGE_MASTER')
 ;
 
--- ユーザーロールの投入
-INSERT INTO user_role (user_id, role_id)
-VALUES
- (1, 1) -- Admin UserにADMINロールを付与
-,(1, 2) -- Admin UserにUSERロールを付与
-,(2, 2) -- Regular UserにUSERロールを付与
-;
 
 -- バッチ実行履歴の投入（adminユーザーで2件の成功データ）
 INSERT INTO batch_execution_history (id, job_id, job_name, status, exit_code, user_id, start_time, end_time, created_at)

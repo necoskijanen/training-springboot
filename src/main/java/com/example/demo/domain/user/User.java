@@ -30,7 +30,8 @@ public class User {
     private Boolean admin;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<Role> roles;
+    @Builder.Default
+    private List<Role> roles = List.of();
 
     /**
      * ユーザの基本情報を更新する
@@ -77,9 +78,6 @@ public class User {
      * @return ユーザが指定されたロール名を持つ場合 true、そうでない場合 false
      */
     public boolean hasRole(String roleName) {
-        if (this.roles == null || this.roles.isEmpty()) {
-            return false;
-        }
         return this.roles.stream()
                 .anyMatch(role -> role.getName().equals(roleName));
     }

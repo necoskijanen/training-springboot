@@ -3,10 +3,8 @@ package com.example.demo.application.batch;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -99,9 +97,6 @@ public class BatchService {
      * @return ジョブ設定をラップしたOptional
      */
     private Optional<BatchConfig.Job> getJobByIdOptional(String jobId) {
-        if (batchConfig.getJobs() == null) {
-            return Optional.empty();
-        }
         return batchConfig.getJobs().stream()
                 .filter(job -> job.getId().equals(jobId))
                 .findFirst();
@@ -111,24 +106,32 @@ public class BatchService {
      * 実行ステータスを取得する
      * 
      * @param executionId 実行ID
-     * @return 実行レコード
+     * @return 実行レコード（Optional）
      */
-    public BatchExecution getExecutionStatus(String executionId) {
+    public Optional<BatchExecution> getExecutionStatus(String executionId) {
         // メモリマップで実行中のプロセスを確認
         CompletableFuture<BatchExecution> future = executionMap.get(executionId);
         if (future != null && !future.isDone()) {
-            // 実行中
+            // 実行中の場合、メモリマップの情報を優先
             return batchExecutionRepository.findById(executionId)
-                    .orElseGet(() -> {
-                        BatchExecution execution = new BatchExecution();
-                        execution.setId(executionId);
-                        execution.setStatus(ExecutionStatus.RUNNING);
-                        return execution;
-                    });
+                    .or(() -> Optional.of(createRunningExecution(executionId)));
         }
 
         // メモリにない場合（または完了した場合）はDBから取得
-        return batchExecutionRepository.findById(executionId).orElse(null);
+        return batchExecutionRepository.findById(executionId);
+    }
+
+    /**
+     * 実行中のバッチ実行オブジェクトを作成する
+     * 
+     * @param executionId 実行ID
+     * @return 実行中ステータスの BatchExecution
+     */
+    private BatchExecution createRunningExecution(String executionId) {
+        BatchExecution execution = new BatchExecution();
+        execution.setId(executionId);
+        execution.setStatus(ExecutionStatus.RUNNING);
+        return execution;
     }
 
     /**
@@ -166,7 +169,7 @@ public class BatchService {
             log.warn("Batch execution timeout: {}", executionId);
             process.destroyForcibly();
             // ドメインメソッドでタイムアウトを処理
-            updateExecutionWithDomain(executionId, execution -> execution.timeout());
+            updateExecution(executionId, execution -> execution.timeout());
             return batchExecutionRepository.findById(executionId).orElse(null);
         }
 
@@ -176,11 +179,14 @@ public class BatchService {
                 endTime - startTime);
 
         // ドメインメソッドでステータスを更新
-        if (exitCode == 0) {
-            updateExecutionWithDomain(executionId, execution -> execution.completeSuccessfully());
-        } else {
-            updateExecutionWithDomain(executionId, execution -> execution.completeFailed(exitCode));
-        }
+        final int code = exitCode;
+        updateExecution(executionId, execution -> {
+            if (code == 0) {
+                execution.completeSuccessfully();
+            } else {
+                execution.completeFailed(code);
+            }
+        });
 
         // 更新された実行レコードを返す
         return batchExecutionRepository.findById(executionId).orElse(null);
@@ -194,7 +200,7 @@ public class BatchService {
      * @return 実行レコード
      */
     private BatchExecution handleExecutionError(String executionId, Exception e) {
-        updateExecutionWithDomain(executionId, execution -> execution.completeFailed(1));
+        updateExecution(executionId, execution -> execution.completeFailed(1));
         return batchExecutionRepository.findById(executionId).orElse(null);
     }
 
@@ -204,27 +210,25 @@ public class BatchService {
      * @param process プロセス
      */
     private void readProcessOutput(Process process) {
-        // 標準出力を読み取るスレッド
-        new Thread(() -> {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    log.debug("Process output: {}", line);
-                }
-            } catch (Exception e) {
-                log.warn("Error reading process output", e);
-            }
-        }).start();
+        readStreamAsync(process.getInputStream(), "Process output");
+        readStreamAsync(process.getErrorStream(), "Process error");
+    }
 
-        // 標準エラーを読み取るスレッド
+    /**
+     * プロセスのストリームを非同期で読み取る
+     * 
+     * @param stream    ストリーム
+     * @param logPrefix ログプレフィックス
+     */
+    private void readStreamAsync(java.io.InputStream stream, String logPrefix) {
         new Thread(() -> {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    log.debug("Process error: {}", line);
+                    log.debug("{}: {}", logPrefix, line);
                 }
             } catch (Exception e) {
-                log.warn("Error reading process error", e);
+                log.warn("Error reading {}", logPrefix, e);
             }
         }).start();
     }
@@ -235,7 +239,7 @@ public class BatchService {
      * @param executionId 実行ID
      * @param updater     実行オブジェクトを更新する関数型インターフェース
      */
-    private void updateExecutionWithDomain(String executionId, java.util.function.Consumer<BatchExecution> updater) {
+    private void updateExecution(String executionId, java.util.function.Consumer<BatchExecution> updater) {
         batchExecutionRepository.findById(executionId).ifPresent(execution -> {
             try {
                 updater.accept(execution);

@@ -115,9 +115,7 @@ public class BatchRestController {
     public ResponseEntity<StatusResponse> getStatus(@PathVariable String executionId) {
         log.debug("Get status for execution: {}", executionId);
 
-        BatchExecution execution = batchService.getExecutionStatus(executionId);
-
-        return java.util.Optional.ofNullable(execution)
+        return batchService.getExecutionStatus(executionId)
                 .map(exec -> ResponseEntity.ok(StatusResponse.builder()
                         .status(exec.getStatus())
                         .exitCode(exec.getExitCode())

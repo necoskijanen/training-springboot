@@ -15,7 +15,7 @@ import java.util.Map;
 @Data
 public class BatchConfig {
 
-    private List<Job> jobs;
+    private List<Job> jobs = new ArrayList<>();
 
     @Data
     public static class Job {
