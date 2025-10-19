@@ -30,6 +30,19 @@ spring:
   config:
     import: classpath:batch/config.yml
 
+  web:
+    resources:
+      cache:
+        # 開発中はキャッシュを完全に無効化する（有効期限を0にする）
+        cachecontrol:
+          max-age: 0 
+          # no-cache, no-store, must-revalidate を設定
+          no-cache: true
+          no-store: true
+          must-revalidate: true
+      # リソースのバージョン管理を無効化（キャッシュさせない場合は不要）
+      chain:
+        cache: false
 mybatis:
   type-aliases-package: com.example.demo.domain.user
   mapper-locations: 
