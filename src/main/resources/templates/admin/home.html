@@ -13,7 +13,7 @@
         <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
 
         <main role="main">
-            <h1>ようこそADMIN！</h1>
+            <h1>ようこそ<span th:text="${username}"></span></h1>
         </main>
     </div>
 

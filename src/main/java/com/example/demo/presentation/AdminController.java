@@ -3,6 +3,7 @@ package com.example.demo.presentation;
 import com.example.demo.application.user.UserService;
 import com.example.demo.application.user.dto.CreateUserRequest;
 import com.example.demo.application.user.dto.UpdateUserRequest;
+import com.example.demo.authentication.AuthenticationUtil;
 import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.exception.UserDomainException;
 import jakarta.validation.Valid;
@@ -29,11 +30,16 @@ public class AdminController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private AuthenticationUtil authenticationUtil;
+
     /**
      * 管理者ホーム画面を表示
      */
     @GetMapping("/home")
-    public String adminHome() {
+    public String adminHome(Model model) {
+        String username = authenticationUtil.getAuthenticatedUsername();
+        model.addAttribute("username", username);
         return "admin/home";
     }
 
