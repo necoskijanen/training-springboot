@@ -39,14 +39,8 @@ public class DevCommandBuilder implements CommandBuilder {
      */
     private String addOsSpecificExtension(String command) {
         String osName = System.getProperty("os.name").toLowerCase();
-        String commandWithExtension;
-
-        if (osName.contains("windows")) {
-            commandWithExtension = command + ".bat";
-        } else {
-            commandWithExtension = command + ".sh";
-        }
-
+        String extension = osName.contains("windows") ? ".bat" : ".sh";
+        String commandWithExtension = command + extension;
         log.info("OS: {}, Command: {} -> {}", osName, command, commandWithExtension);
         return commandWithExtension;
     }

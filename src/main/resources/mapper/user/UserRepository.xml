@@ -142,6 +142,32 @@
         ORDER BY u.id
     </select>
 
+    <select id="findByIds" resultMap="userResultMap">
+        SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.password,
+            u.is_active,
+            u.admin,
+            u.created_at,
+            u.updated_at,
+            r.id as role_id,
+            r.name as role_name
+        FROM
+            user_master u
+        LEFT JOIN
+            user_role ur ON u.id = ur.user_id
+        LEFT JOIN
+            role_definition r ON ur.role_id = r.id
+        WHERE
+            u.id IN
+            <foreach item="id" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        ORDER BY u.id
+    </select>
+
     <insert id="insertUserRole">
         INSERT INTO user_role (user_id, role_id)
         VALUES (#{userId}, #{roleId})

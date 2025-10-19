@@ -3,6 +3,7 @@ package com.example.demo.domain.batch.repository;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.example.demo.application.batch.dto.BatchSearchParams;
 import com.example.demo.domain.batch.BatchExecution;
 
 import java.util.List;
@@ -56,32 +57,19 @@ public interface BatchExecutionRepository {
         long countByUserId(Long userId);
 
         /**
-         * 検索条件でバッチ実行レコードを検索する
+         * 検索条件でバッチ実行レコードを検索する（パラメータオブジェクト版）
          * 
-         * @param userId        ユーザーID（一般ユーザのフィルタリング用、管理者の場合はnull）
-         * @param jobName       ジョブ名（部分一致）
-         * @param status        ステータス
-         * @param startDateFrom ジョブ開始日時の下限
-         * @param endDateTo     ジョブ終了日時の上限
-         * @param offset        オフセット
-         * @param limit         件数制限
+         * @param params 検索パラメータオブジェクト
          * @return バッチ実行レコードのリスト
          */
-        List<BatchExecution> searchBatchExecution(@Param("userId") Long userId, @Param("jobName") String jobName,
-                        @Param("status") String status, @Param("startDateFrom") Object startDateFrom,
-                        @Param("endDateTo") Object endDateTo, @Param("offset") int offset, @Param("limit") int limit);
+        List<BatchExecution> searchBatchExecution(BatchSearchParams params);
 
         /**
-         * 検索条件でバッチ実行レコードの総件数を取得する
+         * 検索条件でバッチ実行レコードの総件数を取得する（パラメータオブジェクト版）
          * 
-         * @param userId        ユーザーID（一般ユーザのフィルタリング用、管理者の場合はnull）
-         * @param jobName       ジョブ名（部分一致）
-         * @param status        ステータス
-         * @param startDateFrom ジョブ開始日時の下限
-         * @param endDateTo     ジョブ終了日時の上限
+         * @param params 検索パラメータオブジェクト
          * @return 総件数
          */
-        long countBatchExecution(@Param("userId") Long userId, @Param("jobName") String jobName,
-                        @Param("status") String status, @Param("startDateFrom") Object startDateFrom,
-                        @Param("endDateTo") Object endDateTo);
+        long countBatchExecution(BatchSearchParams params);
+
 }

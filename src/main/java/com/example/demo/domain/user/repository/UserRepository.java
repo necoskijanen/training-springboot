@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * ユーザリポジトリ（MyBatisマッパー）
@@ -73,6 +74,14 @@ public interface UserRepository {
      * @return ユーザリスト
      */
     List<User> findAll();
+
+    /**
+     * 複数のIDでユーザを検索
+     * 
+     * @param ids ユーザIDのセット
+     * @return ユーザリスト
+     */
+    List<User> findByIds(@Param("ids") Set<Long> ids);
 
     /**
      * ロール名からロールIDを取得

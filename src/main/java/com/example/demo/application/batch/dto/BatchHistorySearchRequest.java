@@ -1,27 +1,32 @@
 package com.example.demo.application.batch.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * バッチ履歴検索条件DTO
+ * クエリパラメータから受け取る検索条件を表現
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class BatchHistorySearchRequest {
-    private String jobName; // バッチ名
-    private String status; // ステータス
-    private LocalDate startDateFrom; // 開始日時（開始）
-    private LocalDate startDateTo; // 開始日時（終了）
-    private LocalDate endDateFrom; // 終了日時（開始）
-    private LocalDate endDateTo; // 終了日時（終了）
-    private Long userId; // 実行ユーザーID（管理者用）
-    private Integer page; // ページ番号（0から始まる）
-    private Integer pageSize; // ページサイズ
+    private String jobName; // ジョブ名（部分一致、optional）
+    private String status; // ステータス（optional）
+    private LocalDateTime startDateFrom; // 開始日時の下限（optional）
+    private LocalDateTime endDateTo; // 終了日時の上限（optional）
+    private String userName; // 検索対象ユーザー名（管理者用、optional）
+
+    @Builder.Default
+    private Integer page = 0; // ページ番号（0から始まる、デフォルト0）
+
+    @Builder.Default
+    private Integer pageSize = 10; // ページサイズ（デフォルト10）
 }

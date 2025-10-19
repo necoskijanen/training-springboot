@@ -2,10 +2,13 @@ package com.example.demo.application.batch;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +16,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.authentication.AuthenticationUtil;
+import com.example.demo.application.batch.mapper.BatchMapper;
 import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
 import com.example.demo.domain.batch.ExecutionStatus;
+import com.example.demo.domain.batch.exception.BatchDomainException;
+import com.example.demo.domain.batch.exception.BatchErrorCode;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
+import com.example.demo.presentation.BatchRestController.StatusResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @Transactional
-public class BatchService {
+public class BatchExecuteService {
 
     @Autowired
     private BatchExecutionRepository batchExecutionRepository;
@@ -48,15 +55,15 @@ public class BatchService {
      * 
      * @param jobId ジョブID
      * @return 実行ID
-     * @throws com.example.demo.domain.batch.exception.BatchDomainException ジョブが見つからない場合
+     * @throws BatchDomainException ジョブが見つからない場合
      */
     public String startBatch(String jobId) {
         log.info("Starting batch execution for job: {}", jobId);
 
         // ジョブ設定を取得
         BatchConfig.Job job = getJobByIdOptional(jobId)
-                .orElseThrow(() -> new com.example.demo.domain.batch.exception.BatchDomainException(
-                        com.example.demo.domain.batch.exception.BatchErrorCode.JOB_NOT_FOUND));
+                .orElseThrow(() -> new BatchDomainException(
+                        BatchErrorCode.JOB_NOT_FOUND));
 
         // ユーザーIDを取得
         Long userId = authenticationUtil.getCurrentUserId();
@@ -105,12 +112,23 @@ public class BatchService {
     }
 
     /**
-     * 実行ステータスを取得する
+     * 実行ステータスを取得する（DTO版）
+     * 
+     * @param executionId 実行ID
+     * @return ステータスレスポンス（Optional）
+     */
+    public Optional<StatusResponse> getExecutionStatus(String executionId) {
+        return getExecutionEntity(executionId)
+                .map(BatchMapper::toStatusResponse);
+    }
+
+    /**
+     * 実行ステータスを取得する（Entity版）
      * 
      * @param executionId 実行ID
      * @return 実行レコード（Optional）
      */
-    public Optional<BatchExecution> getExecutionStatus(String executionId) {
+    private Optional<BatchExecution> getExecutionEntity(String executionId) {
         // メモリマップで実行中のプロセスを確認
         CompletableFuture<BatchExecution> future = executionMap.get(executionId);
         if (future != null && !future.isDone()) {
@@ -169,7 +187,7 @@ public class BatchService {
         readProcessOutput(process);
 
         // プロセスの終了を待機（タイムアウト設定）
-        boolean finished = process.waitFor(job.getTimeout(), java.util.concurrent.TimeUnit.SECONDS);
+        boolean finished = process.waitFor(job.getTimeout(), TimeUnit.SECONDS);
 
         if (!finished) {
             log.warn("Batch execution timeout: {}", executionId);
@@ -226,7 +244,7 @@ public class BatchService {
      * @param stream    ストリーム
      * @param logPrefix ログプレフィックス
      */
-    private void readStreamAsync(java.io.InputStream stream, String logPrefix) {
+    private void readStreamAsync(InputStream stream, String logPrefix) {
         new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
                 String line;
@@ -245,14 +263,14 @@ public class BatchService {
      * @param executionId 実行ID
      * @param updater     実行オブジェクトを更新する関数型インターフェース
      */
-    private void updateExecution(String executionId, java.util.function.Consumer<BatchExecution> updater) {
+    private void updateExecution(String executionId, Consumer<BatchExecution> updater) {
         batchExecutionRepository.findById(executionId).ifPresent(execution -> {
             try {
                 updater.accept(execution);
                 batchExecutionRepository.update(execution);
                 log.info("Updated execution status: {}, status: {}, exitCode: {}", executionId, execution.getStatus(),
                         execution.getExitCode());
-            } catch (com.example.demo.domain.batch.exception.BatchDomainException e) {
+            } catch (BatchDomainException e) {
                 log.warn("Domain validation failed: {}", e.getMessage());
             }
         });

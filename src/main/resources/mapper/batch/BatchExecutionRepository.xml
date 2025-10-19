@@ -88,7 +88,8 @@
         WHERE user_id = #{userId}
     </select>
 
-    <select id="searchBatchExecution" resultMap="batchExecutionResultMap">
+    <!-- BatchSearchParams を使用した検索（パラメータオブジェクト版） -->
+    <select id="searchBatchExecution" parameterType="com.example.demo.application.batch.dto.BatchSearchParams" resultMap="batchExecutionResultMap">
         SELECT
             id,
             job_id,
@@ -122,10 +123,11 @@
             </if>
         </where>
         ORDER BY end_time DESC
-        LIMIT #{limit} OFFSET #{offset}
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <select id="countBatchExecution" resultType="long">
+    <!-- BatchSearchParams を使用した件数取得（パラメータオブジェクト版） -->
+    <select id="countBatchExecution" parameterType="com.example.demo.application.batch.dto.BatchSearchParams" resultType="long">
         SELECT COUNT(*)
         FROM batch_execution_history
         <where>
