@@ -113,7 +113,7 @@ public class AdminController {
      */
     @GetMapping("/users/{id}/edit")
     public String editUserForm(@PathVariable Long id, Model model) {
-        return userService.findByIdOptional(id)
+        return userService.findById(id)
                 .map(user -> {
                     UpdateUserRequest request = new UpdateUserRequest();
                     request.setId(user.getId());

@@ -46,7 +46,7 @@ public class UserService {
      * @return ユーザをラップしたOptional
      */
     @Transactional(readOnly = true)
-    public Optional<User> findByIdOptional(Long id) {
+    public Optional<User> findById(Long id) {
         log.debug("Finding user by id (Optional): {}", id);
         return userRepository.findById(id);
     }
@@ -77,9 +77,6 @@ public class UserService {
         // ユーザを挿入
         userRepository.insert(user);
 
-        // ロール割り当てを処理
-        assignRoles(user);
-
         log.info("User created successfully: id={}", user.getId());
         return user;
     }
@@ -109,46 +106,12 @@ public class UserService {
             }
         }
 
-        // ドメインメソッドに委譲して更新（状態遷移とバリデーションを実行）
-        existingUser.updateUserInfo(request.getName(), request.getEmail(), request.getAdmin());
-
         // ユーザを更新
+        existingUser.updateUserInfo(request.getName(), request.getEmail(), request.getAdmin());
         userRepository.update(existingUser);
-
-        // ロール割り当てを処理
-        assignRoles(existingUser);
 
         log.info("User updated successfully: id={}", existingUser.getId());
         return existingUser;
     }
 
-    /**
-     * ユーザにロールを割り当てる
-     * 
-     * @param user ユーザオブジェクト
-     */
-    private void assignRoles(User user) {
-        // 既存のロール割り当てを削除
-        userRepository.deleteUserRoles(user.getId());
-
-        // 常に USER ロールを割り当てる
-        Optional.ofNullable(userRepository.findRoleIdByName("USER"))
-                .ifPresentOrElse(
-                        userRoleId -> {
-                            userRepository.insertUserRole(user.getId(), userRoleId);
-                            log.debug("USER role assigned to user: id={}", user.getId());
-                        },
-                        () -> log.warn("USER role not found in role_definition table"));
-
-        // 管理者の場合、ADMIN ロールも割り当てる
-        if (user.getAdmin()) {
-            Optional.ofNullable(userRepository.findRoleIdByName("ADMIN"))
-                    .ifPresentOrElse(
-                            adminRoleId -> {
-                                userRepository.insertUserRole(user.getId(), adminRoleId);
-                                log.debug("ADMIN role assigned to user: id={}", user.getId());
-                            },
-                            () -> log.warn("ADMIN role not found in role_definition table"));
-        }
-    }
 }
