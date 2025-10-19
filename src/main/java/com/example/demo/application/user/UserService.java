@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -40,15 +41,15 @@ public class UserService {
     }
 
     /**
-     * ユーザをIDで取得
+     * ユーザをIDで取得（Optional版）
      * 
      * @param id ユーザID
-     * @return ユーザ（見つからない場合はnull）
+     * @return ユーザをラップしたOptional
      */
     @Transactional(readOnly = true)
-    public User findById(Long id) {
-        log.debug("Finding user by id: {}", id);
-        return userRepository.findById(id).orElse(null);
+    public Optional<User> findByIdOptional(Long id) {
+        log.debug("Finding user by id (Optional): {}", id);
+        return userRepository.findById(id);
     }
 
     /**
@@ -144,23 +145,23 @@ public class UserService {
         userRepository.deleteUserRoles(user.getId());
 
         // 常に USER ロールを割り当てる
-        Long userRoleId = userRepository.findRoleIdByName("USER");
-        if (userRoleId != null) {
-            userRepository.insertUserRole(user.getId(), userRoleId);
-            log.debug("USER role assigned to user: id={}", user.getId());
-        } else {
-            log.warn("USER role not found in role_definition table");
-        }
+        Optional.ofNullable(userRepository.findRoleIdByName("USER"))
+                .ifPresentOrElse(
+                        userRoleId -> {
+                            userRepository.insertUserRole(user.getId(), userRoleId);
+                            log.debug("USER role assigned to user: id={}", user.getId());
+                        },
+                        () -> log.warn("USER role not found in role_definition table"));
 
         // 管理者の場合、ADMIN ロールも割り当てる
         if (user.getAdmin()) {
-            Long adminRoleId = userRepository.findRoleIdByName("ADMIN");
-            if (adminRoleId != null) {
-                userRepository.insertUserRole(user.getId(), adminRoleId);
-                log.debug("ADMIN role assigned to user: id={}", user.getId());
-            } else {
-                log.warn("ADMIN role not found in role_definition table");
-            }
+            Optional.ofNullable(userRepository.findRoleIdByName("ADMIN"))
+                    .ifPresentOrElse(
+                            adminRoleId -> {
+                                userRepository.insertUserRole(user.getId(), adminRoleId);
+                                log.debug("ADMIN role assigned to user: id={}", user.getId());
+                            },
+                            () -> log.warn("ADMIN role not found in role_definition table"));
         }
     }
 }

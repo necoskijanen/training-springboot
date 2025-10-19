@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import com.example.demo.domain.batch.BatchExecution;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * バッチ実行履歴のリポジトリインターフェース
@@ -24,9 +25,9 @@ public interface BatchExecutionRepository {
          * 実行IDでバッチ実行レコードを取得する
          * 
          * @param id 実行ID
-         * @return バッチ実行レコード
+         * @return バッチ実行レコード（取得できない場合は空のOptional）
          */
-        BatchExecution findById(String id);
+        Optional<BatchExecution> findById(String id);
 
         /**
          * バッチ実行レコードを更新する

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CompletableFuture;
@@ -54,10 +55,8 @@ public class BatchService {
         log.info("Starting batch execution for job: {}", jobId);
 
         // ジョブ設定を取得
-        BatchConfig.Job job = getJobById(jobId);
-        if (job == null) {
-            throw new IllegalArgumentException("Job not found: " + jobId);
-        }
+        BatchConfig.Job job = getJobByIdOptional(jobId)
+                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobId));
 
         // 実行IDを生成
         String executionId = UUID.randomUUID().toString();
@@ -103,19 +102,18 @@ public class BatchService {
     }
 
     /**
-     * ジョブIDでジョブ設定を取得する
+     * ジョブIDでジョブ設定を取得する（Optional版）
      * 
      * @param jobId ジョブID
-     * @return ジョブ設定
+     * @return ジョブ設定をラップしたOptional
      */
-    private BatchConfig.Job getJobById(String jobId) {
+    private Optional<BatchConfig.Job> getJobByIdOptional(String jobId) {
         if (batchConfig.getJobs() == null) {
-            return null;
+            return Optional.empty();
         }
         return batchConfig.getJobs().stream()
                 .filter(job -> job.getId().equals(jobId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     /**
@@ -129,17 +127,17 @@ public class BatchService {
         CompletableFuture<BatchExecution> future = executionMap.get(executionId);
         if (future != null && !future.isDone()) {
             // 実行中
-            BatchExecution execution = batchExecutionRepository.findById(executionId);
-            if (execution == null) {
-                execution = new BatchExecution();
-                execution.setId(executionId);
-                execution.setStatus(ExecutionStatus.RUNNING.name());
-            }
-            return execution;
+            return batchExecutionRepository.findById(executionId)
+                    .orElseGet(() -> {
+                        BatchExecution execution = new BatchExecution();
+                        execution.setId(executionId);
+                        execution.setStatus(ExecutionStatus.RUNNING.name());
+                        return execution;
+                    });
         }
 
         // メモリにない場合（または完了した場合）はDBから取得
-        return batchExecutionRepository.findById(executionId);
+        return batchExecutionRepository.findById(executionId).orElse(null);
     }
 
     /**
@@ -177,7 +175,7 @@ public class BatchService {
             log.warn("Batch execution timeout: {}", executionId);
             process.destroyForcibly();
             updateExecutionStatus(executionId, ExecutionStatus.FAILED.name(), 124); // Timeout exit code
-            return batchExecutionRepository.findById(executionId);
+            return batchExecutionRepository.findById(executionId).orElse(null);
         }
 
         int exitCode = process.exitValue();
@@ -192,7 +190,7 @@ public class BatchService {
         updateExecutionStatus(executionId, status, exitCode);
 
         // 更新された実行レコードを返す
-        return batchExecutionRepository.findById(executionId);
+        return batchExecutionRepository.findById(executionId).orElse(null);
     }
 
     /**
@@ -204,7 +202,7 @@ public class BatchService {
      */
     private BatchExecution handleExecutionError(String executionId, Exception e) {
         updateExecutionStatus(executionId, ExecutionStatus.FAILED.name(), 1);
-        return batchExecutionRepository.findById(executionId);
+        return batchExecutionRepository.findById(executionId).orElse(null);
     }
 
     /**
@@ -246,13 +244,12 @@ public class BatchService {
      * @param exitCode    終了コード
      */
     private void updateExecutionStatus(String executionId, String status, Integer exitCode) {
-        BatchExecution execution = batchExecutionRepository.findById(executionId);
-        if (execution != null) {
+        batchExecutionRepository.findById(executionId).ifPresent(execution -> {
             execution.setStatus(status);
             execution.setExitCode(exitCode);
             execution.setEndTime(LocalDateTime.now());
             batchExecutionRepository.update(execution);
             log.info("Updated execution status: {}, status: {}, exitCode: {}", executionId, status, exitCode);
-        }
+        });
     }
 }

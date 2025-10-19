@@ -113,20 +113,20 @@ public class AdminController {
      */
     @GetMapping("/users/{id}/edit")
     public String editUserForm(@PathVariable Long id, Model model) {
-        User user = userService.findById(id);
-        if (user == null) {
-            log.warn("User not found: id={}", id);
-            return "redirect:/admin/users";
-        }
-
-        UpdateUserRequest request = new UpdateUserRequest();
-        request.setId(user.getId());
-        request.setName(user.getName());
-        request.setEmail(user.getEmail());
-        request.setAdmin(user.getAdmin());
-
-        model.addAttribute("updateUserRequest", request);
-        return "admin/users/edit";
+        return userService.findByIdOptional(id)
+                .map(user -> {
+                    UpdateUserRequest request = new UpdateUserRequest();
+                    request.setId(user.getId());
+                    request.setName(user.getName());
+                    request.setEmail(user.getEmail());
+                    request.setAdmin(user.getAdmin());
+                    model.addAttribute("updateUserRequest", request);
+                    return "admin/users/edit";
+                })
+                .orElseGet(() -> {
+                    log.warn("User not found: id={}", id);
+                    return "redirect:/admin/users";
+                });
     }
 
     /**

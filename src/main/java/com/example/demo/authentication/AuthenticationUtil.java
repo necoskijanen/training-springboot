@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.domain.user.repository.UserRepository;
 
+import java.util.Optional;
+
 /**
  * 認証情報ユーティリティ
  */
@@ -72,10 +74,19 @@ public class AuthenticationUtil {
      * @return ユーザー名（未認証の場合はnull）
      */
     public String getAuthenticatedUsername() {
+        return getAuthenticatedUsernameOptional().orElse(null);
+    }
+
+    /**
+     * 認証済みユーザー名を取得（Optional版）
+     * 
+     * @return ユーザー名をラップしたOptional
+     */
+    public Optional<String> getAuthenticatedUsernameOptional() {
         if (!isAuthenticated()) {
-            return null;
+            return Optional.empty();
         }
-        return getAuthentication().getName();
+        return Optional.of(getAuthentication().getName());
     }
 
     /**
@@ -123,10 +134,20 @@ public class AuthenticationUtil {
      * @return ユーザー名
      */
     public static String getCurrentUsername(Authentication authentication) {
+        return getCurrentUsernameOptional(authentication).orElse(null);
+    }
+
+    /**
+     * 認証済みユーザーのユーザー名を取得（Optional版）
+     * 
+     * @param authentication 認証情報
+     * @return ユーザー名をラップしたOptional
+     */
+    public static Optional<String> getCurrentUsernameOptional(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+            return Optional.empty();
         }
-        return authentication.getName();
+        return Optional.of(authentication.getName());
     }
 
     /**
@@ -135,13 +156,21 @@ public class AuthenticationUtil {
      * @return ユーザーID（未認証の場合はnull）
      */
     public Long getCurrentUserId() {
+        return getCurrentUserIdOptional().orElse(null);
+    }
+
+    /**
+     * 現在の認証済みユーザーのユーザーIDを取得（Optional版）
+     * 
+     * @return ユーザーIDをラップしたOptional
+     */
+    public Optional<Long> getCurrentUserIdOptional() {
         Authentication authentication = getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+            return Optional.empty();
         }
         String username = authentication.getName();
         return userRepository.findByName(username)
-                .map(user -> user.getId())
-                .orElse(null);
+                .map(user -> user.getId());
     }
 }
