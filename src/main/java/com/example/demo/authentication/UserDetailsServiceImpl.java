@@ -29,16 +29,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         /**
-         * ユーザ名（メール）でユーザを検索し、Spring Security用の UserDetails を生成する
+         * ユーザ名でユーザを検索し、Spring Security用の UserDetails を生成する
          * 
-         * @param email ユーザのメール（ユーザ名として使用）
-         * @return UserDetails オブジェクト
+         * @param name ユーザ名
+         * @return UserDetails オブジェクト（CustomUserDetails）
          * @throws UsernameNotFoundException ユーザが見つからない場合
          */
         @Override
-        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-                User user = userRepository.findByName(email)
-                                .orElseThrow(() -> new UsernameNotFoundException(email));
+        public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+                User user = userRepository.findByName(name)
+                                .orElseThrow(() -> new UsernameNotFoundException(name));
 
                 // ユーザの admin フラグに基づいて権限を判定
                 // true: ROLE_ADMIN、false: ROLE_USER
@@ -46,14 +46,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 ApplicationRole role = user.hasAdminRole() ? ApplicationRole.ADMIN : ApplicationRole.USER;
                 authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
 
-                // Spring Security の UserDetails オブジェクトを生成
-                return new org.springframework.security.core.userdetails.User(
+                // カスタム UserDetails オブジェクトを生成（ユーザーID を含める）
+                return new CustomUserDetails(
+                                user.getId(),
                                 user.getName(),
                                 user.getPassword(),
-                                user.getIsActive(),
-                                true, // accountNonExpired
-                                true, // credentialsNonExpired
-                                true, // accountNonLocked
-                                authorities);
+                                authorities,
+                                user.getIsActive());
         }
 }

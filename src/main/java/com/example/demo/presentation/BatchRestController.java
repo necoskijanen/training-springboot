@@ -22,7 +22,6 @@ import com.example.demo.application.batch.BatchHistoryService;
 import com.example.demo.application.batch.dto.BatchHistoryPageResponse;
 import com.example.demo.application.batch.dto.BatchHistorySearchRequest;
 import com.example.demo.authentication.AuthenticationUtil;
-import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
 import com.example.demo.domain.batch.ExecutionStatus;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
@@ -55,9 +54,6 @@ public class BatchRestController {
     @Autowired
     private AuthenticationUtil authenticationUtil;
 
-    @Autowired
-    private BatchConfig batchConfig;
-
     /**
      * 有効なジョブ一覧を取得する
      * 
@@ -66,20 +62,7 @@ public class BatchRestController {
     @GetMapping("/jobs")
     public ResponseEntity<List<JobResponse>> getJobs() {
         log.info("Get jobs list");
-
-        List<JobResponse> jobs = batchConfig.getJobs().stream()
-                .filter(BatchConfig.Job::isEnabled)
-                .map(job -> JobResponse.builder()
-                        .id(job.getId())
-                        .name(job.getName())
-                        .description(job.getDescription())
-                        .command(job.getCommand())
-                        .arguments(job.getArguments())
-                        .timeout(job.getTimeout())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(jobs);
+        return ResponseEntity.ok(batchService.getAvailableJobs());
     }
 
     /**
@@ -93,7 +76,21 @@ public class BatchRestController {
         log.info("Execute batch for job: {}", request.getJobId());
 
         try {
-            String executionId = batchService.startBatch(request.getJobId());
+            // メインスレッドで事前にユーザーIDを取得
+            Long userId = authenticationUtil.getCurrentUserId();
+            log.info("Current userId: {}", userId);
+
+            if (userId == null) {
+                log.error("userId is null! Authentication: {}", authenticationUtil.getAuthentication());
+                log.error("Is authenticated: {}", authenticationUtil.isAuthenticated());
+                Object principal = authenticationUtil.getAuthentication() != null
+                        ? authenticationUtil.getAuthentication().getPrincipal()
+                        : null;
+                log.error("Principal: {}, Principal class: {}", principal,
+                        principal != null ? principal.getClass().getName() : "null");
+            }
+
+            String executionId = batchService.startBatch(request.getJobId(), userId);
             return ResponseEntity.ok(new ExecuteResponse(executionId));
         } catch (IllegalArgumentException e) {
             log.warn("Job not found: {}", request.getJobId());

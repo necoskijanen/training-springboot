@@ -1,11 +1,8 @@
 package com.example.demo.authentication;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import com.example.demo.domain.user.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -18,9 +15,6 @@ public class AuthenticationUtil {
     private static final String ANONYMOUS_USER = "anonymousUser";
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private static final String ROLE_USER = "ROLE_USER";
-
-    @Autowired
-    private UserRepository userRepository;
 
     /**
      * 現在の認証情報を取得
@@ -161,6 +155,7 @@ public class AuthenticationUtil {
 
     /**
      * 現在の認証済みユーザーのユーザーIDを取得（Optional版）
+     * CustomUserDetails から直接取得（Repository依存なし）
      * 
      * @return ユーザーIDをラップしたOptional
      */
@@ -169,8 +164,10 @@ public class AuthenticationUtil {
         if (authentication == null || !authentication.isAuthenticated()) {
             return Optional.empty();
         }
-        String username = authentication.getName();
-        return userRepository.findByName(username)
-                .map(user -> user.getId());
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            return Optional.of(((CustomUserDetails) principal).getUserId());
+        }
+        return Optional.empty();
     }
 }

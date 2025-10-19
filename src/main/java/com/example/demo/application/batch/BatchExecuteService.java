@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import com.example.demo.domain.batch.exception.BatchDomainException;
 import com.example.demo.domain.batch.exception.BatchErrorCode;
 import com.example.demo.domain.batch.repository.BatchExecutionRepository;
 import com.example.demo.presentation.BatchRestController.StatusResponse;
+import com.example.demo.presentation.BatchRestController.JobResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,22 +53,21 @@ public class BatchExecuteService {
     private final ConcurrentHashMap<String, CompletableFuture<BatchExecution>> executionMap = new ConcurrentHashMap<>();
 
     /**
-     * バッチを開始する（ジョブID指定）
+     * バッチを開始する（ジョブID・ユーザーID指定）
+     * 非同期処理のため、ユーザーIDは事前に取得して渡す必要がある
      * 
-     * @param jobId ジョブID
+     * @param jobId  ジョブID
+     * @param userId ユーザーID（メインスレッドで取得済み）
      * @return 実行ID
      * @throws BatchDomainException ジョブが見つからない場合
      */
-    public String startBatch(String jobId) {
-        log.info("Starting batch execution for job: {}", jobId);
+    public String startBatch(String jobId, Long userId) {
+        log.info("Starting batch execution for job: {}, userId: {}", jobId, userId);
 
         // ジョブ設定を取得
         BatchConfig.Job job = getJobByIdOptional(jobId)
                 .orElseThrow(() -> new BatchDomainException(
                         BatchErrorCode.JOB_NOT_FOUND));
-
-        // ユーザーIDを取得
-        Long userId = authenticationUtil.getCurrentUserId();
 
         // ドメインのファクトリメソッドを使用して実行を開始
         BatchExecution execution = BatchExecution.startNew(jobId, job.getName(), userId);
@@ -97,6 +98,25 @@ public class BatchExecuteService {
 
         log.info("Batch execution started asynchronously: {}", executionId);
         return executionId;
+    }
+
+    /**
+     * 有効なジョブ一覧を取得する
+     * 
+     * @return 有効なジョブのリスト
+     */
+    public List<JobResponse> getAvailableJobs() {
+        return batchConfig.getJobs().stream()
+                .filter(BatchConfig.Job::isEnabled)
+                .map(job -> JobResponse.builder()
+                        .id(job.getId())
+                        .name(job.getName())
+                        .description(job.getDescription())
+                        .command(job.getCommand())
+                        .arguments(job.getArguments())
+                        .timeout(job.getTimeout())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     /**
