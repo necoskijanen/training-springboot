@@ -62,6 +62,7 @@
     margin-bottom: 15px;
     background: white;
     font-size: 13px;
+    table-layout: fixed;
 }
 
 .parameters-table th,
@@ -69,6 +70,16 @@
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+}
+
+.parameters-table th:first-child,
+.parameters-table td:first-child {
+    width: 30%;
+}
+
+.parameters-table th:last-child,
+.parameters-table td:last-child {
+    width: 70%;
 }
 
 .parameters-table th {
