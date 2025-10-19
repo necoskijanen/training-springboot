@@ -2,6 +2,8 @@ package com.example.demo.application.user;
 
 import com.example.demo.application.user.dto.CreateUserRequest;
 import com.example.demo.application.user.dto.UpdateUserRequest;
+import com.example.demo.application.user.dto.UserResponse;
+import com.example.demo.application.user.mapper.UserMapper;
 import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.exception.UserErrorCode;
 import com.example.demo.domain.user.exception.UserDomainException;
@@ -26,39 +28,43 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserMapper userMapper;
+
     /**
      * ユーザを検索
      * 
      * @param name  ユーザ名（部分一致、nullの場合は検索条件に含めない）
      * @param email メールアドレス（部分一致、nullの場合は検索条件に含めない）
-     * @return ユーザリスト
+     * @return ユーザレスポンス DTO リスト
      */
     @Transactional(readOnly = true)
-    public List<User> searchUsers(String name, String email) {
+    public List<UserResponse> searchUsers(String name, String email) {
         log.debug("Searching users: name={}, email={}", name, email);
-        return userRepository.searchUsers(name, email);
+        List<User> users = userRepository.searchUsers(name, email);
+        return userMapper.toUserResponseList(users);
     }
 
     /**
-     * ユーザをIDで取得（Optional版）
+     * ユーザをIDで取得し、更新用 DTO に変換して返す
      * 
      * @param id ユーザID
-     * @return ユーザをラップしたOptional
+     * @return ユーザ更新リクエスト DTO をラップした Optional
      */
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
+    public Optional<UpdateUserRequest> findById(Long id) {
         log.debug("Finding user by id (Optional): {}", id);
-        return userRepository.findById(id);
+        return userRepository.findById(id)
+                .map(userMapper::toUpdateUserRequest);
     }
 
     /**
      * ユーザを作成
      * 
      * @param request ユーザ作成リクエスト
-     * @return 作成されたユーザ
      * @throws UserDomainException ユーザ名が既に存在する場合
      */
-    public User createUser(CreateUserRequest request) {
+    public void createUser(CreateUserRequest request) {
         log.info("Creating user: name={}, email={}", request.getName(), request.getEmail());
 
         // ユーザ名が既に存在するか確認
@@ -78,17 +84,15 @@ public class UserService {
         userRepository.insert(user);
 
         log.info("User created successfully: id={}", user.getId());
-        return user;
     }
 
     /**
      * ユーザを更新
      * 
      * @param request ユーザ更新リクエスト
-     * @return 更新されたユーザ
      * @throws UserDomainException ユーザが見つからない、またはビジネスルール違反の場合
      */
-    public User updateUser(UpdateUserRequest request) {
+    public void updateUser(UpdateUserRequest request) {
         log.info("Updating user: id={}", request.getId());
 
         // ユーザが存在するか確認
@@ -111,7 +115,6 @@ public class UserService {
         userRepository.update(existingUser);
 
         log.info("User updated successfully: id={}", existingUser.getId());
-        return existingUser;
     }
 
 }

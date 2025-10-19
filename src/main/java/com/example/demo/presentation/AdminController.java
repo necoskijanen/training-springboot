@@ -3,8 +3,8 @@ package com.example.demo.presentation;
 import com.example.demo.application.user.UserService;
 import com.example.demo.application.user.dto.CreateUserRequest;
 import com.example.demo.application.user.dto.UpdateUserRequest;
+import com.example.demo.application.user.dto.UserResponse;
 import com.example.demo.authentication.AuthenticationUtil;
-import com.example.demo.domain.user.User;
 import com.example.demo.domain.user.exception.UserDomainException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ public class AdminController {
 
         log.debug("Searching users: name={}, email={}", name, email);
 
-        List<User> users = userService.searchUsers(name, email);
+        List<UserResponse> users = userService.searchUsers(name, email);
         model.addAttribute("users", users);
         model.addAttribute("name", name);
         model.addAttribute("email", email);
@@ -114,12 +114,7 @@ public class AdminController {
     @GetMapping("/users/{id}/edit")
     public String editUserForm(@PathVariable Long id, Model model) {
         return userService.findById(id)
-                .map(user -> {
-                    UpdateUserRequest request = new UpdateUserRequest();
-                    request.setId(user.getId());
-                    request.setName(user.getName());
-                    request.setEmail(user.getEmail());
-                    request.setAdmin(user.getAdmin());
+                .map(request -> {
                     model.addAttribute("updateUserRequest", request);
                     return "admin/users/edit";
                 })
