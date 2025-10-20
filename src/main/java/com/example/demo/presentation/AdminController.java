@@ -143,7 +143,8 @@ public class AdminController {
         }
 
         try {
-            userService.updateUser(request);
+            Long updaterId = authenticationUtil.getCurrentUserId();
+            userService.updateUser(request, updaterId);
             redirectAttributes.addFlashAttribute("successMessage", "ユーザーを更新しました。");
             return "redirect:/admin/users";
         } catch (UserDomainException e) {

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * ユーザのドメインエンティティ
@@ -41,9 +42,9 @@ public class User {
      * @param admin 管理者フラグ
      * @throws UserDomainException 自分自身の管理者権限を削除しようとした場合
      */
-    public void updateUserInfo(String name, String email, Boolean admin) {
+    public void updateUserInfo(String name, String email, Boolean admin, Long updaterId) {
         // 管理者が自身の権限を削除しようとしていないか確認
-        if (hasAdminRole() && !admin && this.getId() != null) {
+        if (hasAdminRole() && !admin && Objects.equals(id, updaterId)) {
             throw new UserDomainException(UserErrorCode.CANNOT_REVOKE_OWN_ADMIN_RIGHTS);
         }
 

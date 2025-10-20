@@ -92,7 +92,7 @@ public class UserService {
      * @param request ユーザ更新リクエスト
      * @throws UserDomainException ユーザが見つからない、またはビジネスルール違反の場合
      */
-    public void updateUser(UpdateUserRequest request) {
+    public void updateUser(UpdateUserRequest request, Long updaterId) {
         log.info("Updating user: id={}", request.getId());
 
         // ユーザが存在するか確認
@@ -111,7 +111,7 @@ public class UserService {
         }
 
         // ユーザを更新
-        existingUser.updateUserInfo(request.getName(), request.getEmail(), request.getAdmin());
+        existingUser.updateUserInfo(request.getName(), request.getEmail(), request.getAdmin(), updaterId);
         userRepository.update(existingUser);
 
         log.info("User updated successfully: id={}", existingUser.getId());
