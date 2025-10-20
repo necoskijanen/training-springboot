@@ -52,10 +52,10 @@ public class UserService {
      * @return ユーザ更新リクエスト DTO をラップした Optional
      */
     @Transactional(readOnly = true)
-    public Optional<UpdateUserRequest> findById(Long id) {
+    public Optional<UserResponse> findById(Long id) {
         log.debug("Finding user by id (Optional): {}", id);
         return userRepository.findById(id)
-                .map(userMapper::toUpdateUserRequest);
+                .map(userMapper::toUserResponse);
     }
 
     /**
