@@ -108,14 +108,7 @@ public class BatchExecuteService {
     public List<JobResponse> getAvailableJobs() {
         return batchConfig.getJobs().stream()
                 .filter(BatchConfig.Job::isEnabled)
-                .map(job -> JobResponse.builder()
-                        .id(job.getId())
-                        .name(job.getName())
-                        .description(job.getDescription())
-                        .command(job.getCommand())
-                        .arguments(job.getArguments())
-                        .timeout(job.getTimeout())
-                        .build())
+                .map(job -> batchMapper.toJobResponse(job))
                 .collect(Collectors.toList());
     }
 

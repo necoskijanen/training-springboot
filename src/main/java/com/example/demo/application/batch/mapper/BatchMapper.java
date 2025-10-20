@@ -4,7 +4,9 @@ import org.mapstruct.Mapper;
 
 import com.example.demo.application.batch.dto.BatchHistoryResponse;
 import com.example.demo.application.batch.dto.HistoryItem;
+import com.example.demo.application.batch.dto.JobResponse;
 import com.example.demo.application.batch.dto.StatusResponse;
+import com.example.demo.config.BatchConfig;
 import com.example.demo.domain.batch.BatchExecution;
 
 /**
@@ -13,6 +15,14 @@ import com.example.demo.domain.batch.BatchExecution;
  */
 @Mapper(componentModel = "spring")
 public interface BatchMapper {
+
+    /**
+     * BatchConfig.Job を JobResponse に変換する
+     * 
+     * @param job
+     * @return ジョブ情報
+     */
+    JobResponse toJobResponse(BatchConfig.Job job);
 
     /**
      * BatchExecution を StatusResponse に変換する

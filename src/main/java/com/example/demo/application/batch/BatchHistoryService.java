@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.application.batch.dto.BatchHistoryPageResponse;
 import com.example.demo.application.batch.dto.BatchHistoryResponse;
 import com.example.demo.application.batch.dto.BatchHistorySearchRequest;
-import com.example.demo.application.batch.dto.BatchSearchParams;
 import com.example.demo.application.batch.dto.HistoryItem;
 import com.example.demo.application.batch.dto.HistoryResponse;
 import com.example.demo.application.batch.mapper.BatchMapper;
@@ -58,7 +57,7 @@ public class BatchHistoryService {
                 log.info("Get batch history for user: {}, page: {}, pageSize: {}", userId, page, pageSize);
 
                 // 履歴を取得
-                BatchSearchParams params = BatchSearchParams.of(userId, page, pageSize);
+                BatchSearchCriteria params = BatchSearchCriteria.of(userId, page, pageSize);
                 List<BatchExecution> executions = batchRepository.searchBatchExecution(params);
 
                 // 総件数を取得
@@ -95,7 +94,7 @@ public class BatchHistoryService {
                 Long searchUserId = determineSearchUserId(user, request.getUserName());
 
                 // 検索パラメータオブジェクトを作成
-                BatchSearchParams searchParams = BatchSearchParams.of(request, searchUserId);
+                BatchSearchCriteria searchParams = BatchSearchCriteria.of(request, searchUserId);
 
                 // バッチ実行履歴を検索
                 List<BatchExecution> executions = batchRepository.searchBatchExecution(searchParams);

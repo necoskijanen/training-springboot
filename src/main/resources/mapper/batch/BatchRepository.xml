@@ -76,7 +76,7 @@
     </select>
 
     <!-- BatchSearchParams を使用した検索（パラメータオブジェクト版） -->
-    <select id="searchBatchExecution" parameterType="com.example.demo.application.batch.dto.BatchSearchParams" resultMap="batchExecutionResultMap">
+    <select id="searchBatchExecution" parameterType="com.example.demo.application.batch.BatchSearchCriteria" resultMap="batchExecutionResultMap">
         SELECT
             <include refid="batchExecutionColumns"/>
         FROM batch_execution_history
@@ -106,7 +106,7 @@
     </select>
 
     <!-- BatchSearchParams を使用した件数取得（パラメータオブジェクト版） -->
-    <select id="countBatchExecution" parameterType="com.example.demo.application.batch.dto.BatchSearchParams" resultType="long">
+    <select id="countBatchExecution" parameterType="com.example.demo.application.batch.BatchSearchCriteria" resultType="long">
         SELECT COUNT(*)
         FROM batch_execution_history
         <where>

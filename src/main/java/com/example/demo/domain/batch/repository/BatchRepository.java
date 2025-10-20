@@ -2,7 +2,7 @@ package com.example.demo.domain.batch.repository;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.example.demo.application.batch.dto.BatchSearchParams;
+import com.example.demo.application.batch.BatchSearchCriteria;
 import com.example.demo.domain.batch.BatchExecution;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public interface BatchRepository {
          * @param params 検索パラメータオブジェクト
          * @return バッチ実行レコードのリスト
          */
-        List<BatchExecution> searchBatchExecution(BatchSearchParams params);
+        List<BatchExecution> searchBatchExecution(BatchSearchCriteria params);
 
         /**
          * 検索条件でバッチ実行レコードの総件数を取得する
@@ -58,6 +58,6 @@ public interface BatchRepository {
          * @param params 検索パラメータオブジェクト
          * @return 総件数
          */
-        long countBatchExecution(BatchSearchParams params);
+        long countBatchExecution(BatchSearchCriteria params);
 
 }

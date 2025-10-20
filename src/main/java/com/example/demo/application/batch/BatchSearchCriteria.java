@@ -1,7 +1,8 @@
-package com.example.demo.application.batch.dto;
+package com.example.demo.application.batch;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.application.batch.dto.BatchHistorySearchRequest;
 import com.example.demo.util.PaginationHelper;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BatchSearchParams {
+public class BatchSearchCriteria {
     private Long userId; // 検索対象ユーザーID（null = 全員）
     private String jobName; // ジョブ名（部分一致、optional）
     private String status; // ステータス（optional）
@@ -34,9 +35,9 @@ public class BatchSearchParams {
      * @param userId  検索対象ユーザーID（アクセス制御後）
      * @return 検索パラメータオブジェクト
      */
-    public static BatchSearchParams of(BatchHistorySearchRequest request, Long userId) {
+    public static BatchSearchCriteria of(BatchHistorySearchRequest request, Long userId) {
         int offset = PaginationHelper.calculateOffset(request.getPage(), request.getPageSize());
-        return BatchSearchParams.builder()
+        return BatchSearchCriteria.builder()
                 .userId(userId)
                 .jobName(request.getJobName())
                 .status(request.getStatus())
@@ -47,9 +48,9 @@ public class BatchSearchParams {
                 .build();
     }
 
-    public static BatchSearchParams of(Long userId, int page, int pageSize) {
+    public static BatchSearchCriteria of(Long userId, int page, int pageSize) {
         int offset = PaginationHelper.calculateOffset(page, pageSize);
-        return BatchSearchParams.builder()
+        return BatchSearchCriteria.builder()
                 .userId(userId)
                 .offset(offset)
                 .pageSize(pageSize)
