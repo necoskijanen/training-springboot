@@ -1,9 +1,5 @@
 package com.example.demo.config;
 
-import com.example.demo.authentication.CustomAuthenticationFailureHandler;
-import com.example.demo.authentication.CustomAuthenticationSuccessHandler;
-import com.example.demo.authentication.UserDetailsServiceImpl;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +8,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.example.demo.security.CustomAuthenticationFailureHandler;
+import com.example.demo.security.CustomAuthenticationSuccessHandler;
+import com.example.demo.security.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
